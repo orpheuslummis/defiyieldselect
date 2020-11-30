@@ -1,8 +1,9 @@
-# mainnet
+import json
 
 def get_abi(name):
     with open(f"abis/{name}.json", 'r') as f:
-        return f.read()
+        # return f.read()
+        return json.load(f)
 
 compound = dict(
     Comptroller = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',

@@ -1,11 +1,13 @@
 # DeFi yield optimization
 
-overview: get the rates, predict, move accordingly
+overview: get the timeseries of the interest rates, predict which will be the highest, move accordingly
 
 
 ## how are the interests collected in each protocol?
 
-TBD
+in Compound: 
+
+in Aave: the balance in the contract will increase. Therefore at redemption, there will be a higher amount than what was initially deposited.
 
 
 ## data acquisition
@@ -15,6 +17,8 @@ csv
 postgres
 
 https://docs.yield.fi/lending
+
+is the data good.. ? 
 
 
 ### Compound API
@@ -32,7 +36,9 @@ d
 
 
 ### aave
+subgraph - reserve data
 
+`LendingPoolCore`'s `updateReserveInterestRatesAndTimestampInternal()`
 
 
 ## prediction, decision
@@ -44,7 +50,14 @@ old window and new window averages. line and extrapolation between the two. best
 web3 contracts
 back to ETH everytime
 
+dydx - perpetual vs solo: 
+
 
 ## see also
 - https://defirate.com/lend/
 - https://idle.finance/
+- https://yearn.finance/stats
+
+
+## about the ABIs
+couldn't load the 'old' Compound Comptroller ABI because it wasn't validating with web3py

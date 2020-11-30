@@ -9,6 +9,13 @@ def setup():
     os.makedirs("data/", exist_ok=True)
 
 
+def obtain(protocols, assets):
+    jsons = dl_jsons(protocols, assets)
+    pairsdf = {}
+    for pair in jsons:
+        pairsdf[pair] = pd.Series(jsons[pair]['supply'])
+    return pairsdf
+
 def dl_jsons(protocols, assets):
     for (protocol, asset) in itertools.product(protocols, assets):
         with open(f"data/{protocol}_{asset}.json", 'w') as f:

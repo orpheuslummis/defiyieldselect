@@ -1,6 +1,7 @@
 import pandas as pd
+import datetime
 
-import data
+import datamanager
 
 
 assets = [
@@ -19,21 +20,14 @@ def a_few_stats(timeseries: pd.Series):
     return {
         "len": len(timeseries),
         "autocorr": timeseries.autocorr(),
-        # "pct_change": timeseries.pct_change()
+        # "pct_change": timeseries.pct_change(),
+        "initial_datetime": datetime.datetime.fromtimestamp(timeseries[0][0]),
     }
 
 
 if __name__ == "__main__":
-    # "DATA ACQUISITION"
-    jsons = data.read_jsons(protocols, assets)
-    stats = {}
-    for pair in jsons:
-        df = pd.Series(jsons[pair]['supply'])
-        stats[pair] = a_few_stats(df)
-    # [print(pair, stats[pair]) for pair in stats]
-    
+    pairsdf = datamanager.obtain(protocols, assets) # pairs like (protocol, asset)
 
-    # "PREDICTIONS"
     # for now let's just say we wanna 'go to' the option with the highest autocorrelation
     # list of dicts, i want to find the key with a max value
     d = {pair: stats[pair]['autocorr'] for pair in stats}
@@ -42,8 +36,10 @@ if __name__ == "__main__":
     print(f"therefore we go to {max_pair}")
 
 
-    # "MOVEMENT"
+    # MOVEMENT
     print(f"""
     status quo: {asset_from}
     direction: {asset_direction}
     """)
+
+    

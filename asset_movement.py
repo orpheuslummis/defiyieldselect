@@ -3,12 +3,10 @@ v0: protocol0 → eth → protocol1
 
 v1: protocol0(asset0) → asset0 → asset1 → protocol1(asset1)
 """
-
-import web3
-
 import main
 import account
 import contracts_info
+from web3 import Web3
 
 
 class Protocol:
@@ -21,6 +19,20 @@ class Protocol:
 
 
 class Aave(Protocol):
+    """
+    https://docs.aave.com/developers/developing-on-aave/the-protocol/safety-module-stkaave#integrating-staking
+
+    approve() the amount for the Staked AAVE contract to stake
+    stake()
+
+    getTotalRewardsBalance()
+    claimRewards()
+
+    cooldown()
+    # wait stakersCooldown()+COOLDOWN_SECONDS() until the cooldown finishes
+    # we have until UNSTAKE_WINDOW() of time to redeem
+    redeem()
+    """
     pass
 
 
@@ -32,9 +44,14 @@ class Compound(Protocol):
     # before being able to supply, we need the account to enter the market 
     # different process for cETH than cERC20
     # NOTE that the account will also accumulate COMP tokens over time...
-
-    def __init__(self):
-        self.troll = w3.eth.contract(address=contracts_info.compound.Comptroller, abi=contracts_info.get_abi("compound_comptroller"))
+    
+    def __init__(self, w3):
+        self.w3 = w3
+        address = Web3.toChecksumAddress(contracts_info.compound['Comptroller'])
+        self.troll = w3.eth.contract(
+            address=address, 
+            abi=contracts_info.get_abi("compound2")
+        )
 
     def enter(self):
         pass
@@ -57,9 +74,3 @@ class Compound(Protocol):
         #     gasLimit: web3.utils.toHex(500000),
         #     gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
         # });
-
-
-
-if __name__ == "__main__":
-    for p in main.protocols:
-        print(f"eth → {p}\n{p} → eth")
