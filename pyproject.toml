@@ -7,12 +7,12 @@ authors = ["Orpheus Lummis <o@orpheuslummis.info>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 requests = "^2.25.0"
-pandas = "^1.1.4"
-web3 = "^5.13.0"
+# pandas = "^1.1.4"
+# web3 = "^5.13.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"
-eth-tester = "^0.5.0-beta.3"
+# eth-tester = "^0.5.0-beta.3"
 ipykernel = "^5.3.4"
 
 [build-system]
