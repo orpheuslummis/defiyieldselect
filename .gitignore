@@ -3,3 +3,4 @@ __pycache__
 venv
 jupyter/.ipynb_checkpoints/
 .vscode
+datacollect/data/*
