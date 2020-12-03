@@ -1,7 +1,10 @@
-import requests
 import csv
-import sched, time
+import os
+import sched
 import sys
+import time
+
+import requests
 
 PATH = "data/"
 token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
@@ -43,6 +46,7 @@ def trigger_collection(token, sc):
 
 
 if __name__ == "__main__":
+	os.makedirs(PATH, exist_ok=True)
 
     try:
     	sc = int(sys.argv[1])
