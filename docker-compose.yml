@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  data:
+    build: .
+    command: python datacollect/collect.py
+    volumes: [data_vol:/data/]
+volumes:
+  data_vol:
