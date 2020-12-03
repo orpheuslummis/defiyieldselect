@@ -61,3 +61,21 @@ dydx - perpetual vs solo:
 
 ## about the ABIs
 couldn't load the 'old' Compound Comptroller ABI because it wasn't validating with web3py
+
+---
+
+## Miguel notes:
+
+### Cusomer documentation:
+
+**Objectives:**
+
+We aim to build a machine learning model to make predictions and movements to optimize the investment of cryptocurrency across interest yield.
+
+**Initial goal:** Optimize for which Pair we should swap investments for using the data.
+
+Questions:
+
+- What are they interested to invest on? ( Cryptos, Loans (?) )
+
+- What are the pairs the are interested to use?
