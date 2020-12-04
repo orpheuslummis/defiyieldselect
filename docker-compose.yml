@@ -1,8 +1,8 @@
 version: "3.8"
 services:
-  data:
+  collect_orcadefi:
     build: .
-    command: python datacollect/collect.py
+    command: python datacollect/collect_orcadefi.py
     volumes: [data_vol:/data/]
 volumes:
   data_vol:
