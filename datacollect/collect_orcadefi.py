@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 import sched
 import sys
@@ -7,13 +8,16 @@ import time
 import requests
 
 
+logging.basicConfig(format='{asctime} - {name} - {levelname} - {message}', style='{')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
 INTERVAL = 60
 PATH = "/data/"
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
 API_URL = "http://orcadefi.com:10000/api/v1/realtime/"
 # API_URL = "http://orcadefi.com/api/v1/public/"
-
-s = sched.scheduler(time.time, time.sleep)
 
 
 def get_response_defi(query):
@@ -21,15 +25,19 @@ def get_response_defi(query):
         response = requests.get(url=query)
         return response.json()
     except requests.exceptions.ConnectionError as e:
-        print(f"{type(e)}, {e}")
+        logger.error(f"{type(e)}, {e}")
 
 
 def collect_data(token):
     query = f"{API_URL}all?token={token}"
 
-    platforms = get_response_defi(query)
+    try:
+        platforms_items = get_response_defi(query).items()
+    except AttributeError as e:
+        logger.error(e)
+        return
 
-    for key_platform, val in platforms.items():
+    for key_platform, val in platforms_items:
         # Iterate over every pair for each platform 
         platform = val['Platform']
         measurement = val['_measurement']
@@ -45,20 +53,23 @@ def collect_data(token):
                 with open(f"{file}.csv", 'a') as data:
                     wr = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     wr.writerow([start, stop, apr])
+    logger.info("query successful")
+        
 
 
 def trigger_collection(token, sc):
     collect_data(token)
-    s.enter(sc, 1, trigger_collection, argument=(token, sc,))
+    s.enter(seconds, 1, trigger_collection, argument=(token, seconds,))
     s.run()
 
 
 if __name__ == "__main__":
-    os.makedirs(PATH, exist_ok=True)
+    # os.makedirs(PATH, exist_ok=True) # should exist already because of the Docker setup
+    s = sched.scheduler(time.time, time.sleep)
 
     try:
-        sc = int(sys.argv[1])
+        seconds = int(sys.argv[1])
     except IndexError as e:
-        sc = INTERVAL
+        seconds = INTERVAL
 
-    trigger_collection(TOKEN, sc)
+    trigger_collection(TOKEN, seconds)
