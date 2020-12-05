@@ -17,25 +17,18 @@ INTERVAL = 60
 PATH = "/data/"
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
 API_URL = "http://orcadefi.com:10000/api/v1/realtime/"
-# API_URL = "http://orcadefi.com/api/v1/public/"
-
-
-def get_response_defi(query):
-    try:
-        response = requests.get(url=query)
-        return response.json()
-    except requests.exceptions.ConnectionError as e:
-        logger.error(f"{type(e)}, {e}")
 
 
 def collect_data(token):
     query = f"{API_URL}all?token={token}"
 
     try:
-        platforms_items = get_response_defi(query).items()
-    except AttributeError as e:
-        logger.error(e)
+        response = requests.get(url=query)
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"{type(e)}, {e}")
         return
+
+    platforms_items = response.json().items()
 
     for key_platform, val in platforms_items:
         # Iterate over every pair for each platform 
