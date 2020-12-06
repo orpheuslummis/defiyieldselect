@@ -4,9 +4,9 @@ services:
     build: .
     command: python datacollect/collect_orcadefi.py
     volumes: [data_vol:/data/]
-  collect_yieldfi: # just to run as one-off job, occasionally
-    build: .
-    command: python datacollect/collect_yieldfi.py
-    volumes: [data_vol:/data/]
+  # collect_yieldfi: # just to run as one-off job, occasionally
+  #   build: .
+  #   command: python datacollect/collect_yieldfi.py
+  #   volumes: [data_vol:/data/]
 volumes:
   data_vol:
