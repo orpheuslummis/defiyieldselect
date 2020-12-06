@@ -1,4 +1,5 @@
 import itertools
+import os
 import warnings
 from datetime import datetime
 
@@ -6,18 +7,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
+from sktime.forecasting.arima import AutoARIMA
 from sktime.forecasting.compose import ReducedRegressionForecaster
-from sktime.forecasting.model_selection import temporal_train_test_split
-from sktime.performance_metrics.forecasting import smape_loss
-from sktime.utils.plotting import plot_series
-
-from sktime.forecasting.naive import NaiveForecaster
-from sktime.forecasting.trend import PolynomialTrendForecaster
 from sktime.forecasting.ets import AutoETS
 from sktime.forecasting.exp_smoothing import ExponentialSmoothing
-from sktime.forecasting.arima import AutoARIMA
+from sktime.forecasting.model_selection import temporal_train_test_split
+from sktime.forecasting.naive import NaiveForecaster
 from sktime.forecasting.theta import ThetaForecaster
-
+from sktime.forecasting.trend import PolynomialTrendForecaster
+from sktime.performance_metrics.forecasting import smape_loss
+from sktime.utils.plotting import plot_series
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -37,9 +36,13 @@ def load_data_raw():
     return timeseries_pairs
 
 
-def preprocess_data(timeseries_pairs):
-    for pair in timeseries_pairs:
-        timeseries = timeseries_pairs[pair]
+def preprocess_data(data):
+    timeseries_pairs = {}
+    for pair in data:
+        timeseries = data[pair]
+        # simpler pair name
+        pair = pair.replace('/','_')
+        # resampling to have constant sampling rate for broad compatibility
         timeseries_pairs[pair] = timeseries.resample(BIN_PERIOD).bfill()
     return timeseries_pairs
 
@@ -58,14 +61,16 @@ if __name__ == "__main__":
     forecasters = {
         "poly1": PolynomialTrendForecaster(),
         "poly2": PolynomialTrendForecaster(degree=2),
-        "poly3": PolynomialTrendForecaster(degree=3),
-        "poly4": PolynomialTrendForecaster(degree=4),
-        "poly5": PolynomialTrendForecaster(degree=5),
+        # "poly3": PolynomialTrendForecaster(degree=3),
+        # "poly4": PolynomialTrendForecaster(degree=4),
+        # "poly5": PolynomialTrendForecaster(degree=5),
         # "expsmoothing": ExponentialSmoothing(),
         # "autoets": AutoETS(),
         # "autoarima": AutoARIMA(),
         # "theta": ThetaForecaster(),
     }
+
+    results = {pair: {} for pair in timeseries_pairs}
 
     possibilities = itertools.product(forecasters, timeseries_pairs)
     for p in possibilities:
@@ -79,8 +84,17 @@ if __name__ == "__main__":
         fh = np.arange(len(x_test)) + 1  # FIXME robust?
         x_pred = forecaster.predict(fh)
 
-        plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
-        plt.title(f"{pair} with forecaster {forecaster_name}")
-        plt.savefig(f"images/{pair.replace('/','_')}_{forecaster_name}_{datetime.now().isoformat()}.png")
+        if os.getenv("YIELDS_PLOT") == "True":
+            plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
+            plt.title(f"{pair} with forecaster {forecaster_name}")
+            plt.savefig(f"results/{pair}_{forecaster_name}_{datetime.now().isoformat()}.png")
 
-        print(f"{pair=} {forecaster_name=} {smape_loss(x_test, x_pred)=}")
+        smape_loss_result = smape_loss(x_test, x_pred)
+        print(f"{pair=} {forecaster_name=} {smape_loss_result=}")
+        results[pair][forecaster_name] = smape_loss_result
+
+    pd.DataFrame.from_dict(results).to_json(f"results/results_{datetime.now().isoformat()}.json", indent=4)
+
+    for pair in timeseries_pairs:
+        results_pair = results[pair]
+        print(f"best forecaster with {pair}: {min(results_pair, key=results_pair.get)}")
