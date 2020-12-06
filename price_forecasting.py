@@ -24,6 +24,9 @@ PATH_DATA_PRICES = 'data/csv/PairPrices4DEC.csv'
 PATH_DATA_ORCADEFI = 'data/data_orcadefi'
 PLATFORMS = ['aave', 'compound', 'dydx', 'fulcrum']
 BIN_PERIOD = '1h'
+RESULTS_DIR = 'results'
+os.makedirs(RESULTS_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR+"/images", exist_ok=True)
 
 
 def load_data_raw():
@@ -87,13 +90,13 @@ if __name__ == "__main__":
         if os.getenv("YIELDS_PLOT") == "True":
             plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
             plt.title(f"{pair} with forecaster {forecaster_name}")
-            plt.savefig(f"results/{pair}_{forecaster_name}_{datetime.now().isoformat()}.png")
+            plt.savefig(f"{RESULTS_DIR}/images/{pair}_{forecaster_name}_{datetime.now().isoformat()}.png")
 
         smape_loss_result = smape_loss(x_test, x_pred)
         print(f"{pair=} {forecaster_name=} {smape_loss_result=}")
         results[pair][forecaster_name] = smape_loss_result
 
-    pd.DataFrame.from_dict(results).to_json(f"results/results_{datetime.now().isoformat()}.json", indent=4)
+    pd.DataFrame.from_dict(results).to_json(f"{RESULTS_DIR}/results_{datetime.now().isoformat()}.json", indent=4)
 
     for pair in timeseries_pairs:
         results_pair = results[pair]
