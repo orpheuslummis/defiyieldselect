@@ -6,3 +6,5 @@ jupyter/.ipynb_checkpoints/
 datacollect/data/*
 data/
 tmp/
+images/
+.DS_Store
