@@ -24,29 +24,27 @@ def collect_data(token):
 
     try:
         response = requests.get(url=query)
+        platforms_items = response.json().items()
+
+        for key_platform, val in platforms_items:
+            # Iterate over every pair for each platform 
+            platform = val['Platform']
+            measurement = val['_measurement']
+            start = val['_start']
+            stop = val['_stop']
+
+            for pair, apr in val.items():
+                if pair.isupper():
+                    file = f'{PATH}/{platform}_{pair}_{measurement}'
+                    # TODO if the previous data point is the same as now, log but don't store
+                    with open(f"{file}.csv", 'a') as data:
+                        wr = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                        wr.writerow([start, stop, apr])
+        logger.info("query successful")
+        
     except requests.exceptions.ConnectionError as e:
         logger.error(f"{type(e)}, {e}")
         return
-
-    platforms_items = response.json().items()
-
-    for key_platform, val in platforms_items:
-        # Iterate over every pair for each platform 
-        platform = val['Platform']
-        measurement = val['_measurement']
-        start = val['_start']
-        stop = val['_stop']
-
-        for pair, apr in val.items():
-            if pair.isupper():
-                file = f'{PATH}/{platform}_{pair}_{measurement}'
-
-                # TODO if the previous data point is the same as now, log but don't store
-                
-                with open(f"{file}.csv", 'a') as data:
-                    wr = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                    wr.writerow([start, stop, apr])
-    logger.info("query successful")
         
 
 
