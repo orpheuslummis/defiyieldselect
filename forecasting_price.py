@@ -120,5 +120,6 @@ if __name__ == "__main__":
                 plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
                 plt.title(f"{pair} {forecaster_name} {forecaster_config_name}")
                 plt.savefig(f"{results_path}/{pair}_{forecaster_name}_{forecaster_config_name}_{datetime.utcnow().strftime(TIME_FORMAT)}.png")
+                plt.close()
 
     pd.DataFrame.from_dict(results).to_json(f"{results_path}/result.json", indent=4)
