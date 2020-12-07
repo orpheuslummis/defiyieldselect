@@ -22,13 +22,44 @@ from sktime.utils.plotting import plot_series
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-
 PATH_DATA_PRICES = 'data/csv/PairPrices4DEC.csv'
 PATH_DATA_ORCADEFI = 'data/data_orcadefi'
 PLATFORMS = ['aave', 'compound', 'dydx', 'fulcrum']
 BIN_PERIOD = '1h'
 RESULTS_DIR = 'results'
 TIME_FORMAT = '%Y-%m-%d_%H_%MZ'
+
+
+forecasters = {
+    "naive": NaiveForecaster,
+    "poly": PolynomialTrendForecaster,
+    "exponential": ExponentialSmoothing,
+    "theta": ThetaForecaster,
+    # AutoETS,
+    # AutoARIMA,
+}
+
+forecaster_configs = {
+    "naive": {
+        "last": {"strategy": "last"},
+        "mean": {"strategy": "mean"},
+        "drift": {"strategy": "drift"},
+    },
+    "poly": {
+        "degree1_linear": {"degree": 1, "regressor": sklearn.linear_model.LinearRegression()},
+        # {"degree": 1, "regressor": sklearn.linear_model.LogisticRegression()},
+        "degree2_linear": {"degree": 2, "regressor": sklearn.linear_model.LinearRegression()},
+        # {"degree": 2, "regressor": sklearn.linear_model.LogisticRegression()},
+        "degree3_linear": {"degree": 3, "regressor": sklearn.linear_model.LinearRegression()},
+        # {"degree": 3, "regressor": sklearn.linear_model.LogisticRegression()},
+    },
+    "exponential": {
+        "default": {},
+    },
+    "theta": {
+        "default": {},
+    },
+}
 
 
 def load_data_raw():
@@ -52,12 +83,6 @@ def preprocess_data(data):
     return timeseries_pairs
 
 
-def display_plots(timeseries_pairs):
-    for timeseries in timeseries_pairs:
-        plot_series(timeseries_pairs[timeseries], list=[timeseries])
-        plt.show()
-
-
 if __name__ == "__main__":
     try: # memoization
         with shelve.open('data/processed_data') as db:
@@ -67,37 +92,6 @@ if __name__ == "__main__":
         with shelve.open('data/processed_data') as db:
             db['timeseries_pairs'] = timeseries_pairs
     
-    forecasters = {
-        "naive": NaiveForecaster,
-        "poly": PolynomialTrendForecaster,
-        "exponential": ExponentialSmoothing,
-        "theta": ThetaForecaster,
-        # AutoETS,
-        # AutoARIMA,
-    }
-
-    forecaster_configs = {
-        "naive": {
-            "last": {"strategy": "last"},
-            "mean": {"strategy": "mean"},
-            "drift": {"strategy": "drift"},
-        },
-        "poly": {
-            "degree1_linear": {"degree": 1, "regressor": sklearn.linear_model.LinearRegression()},
-            # {"degree": 1, "regressor": sklearn.linear_model.LogisticRegression()},
-            "degree2_linear": {"degree": 2, "regressor": sklearn.linear_model.LinearRegression()},
-            # {"degree": 2, "regressor": sklearn.linear_model.LogisticRegression()},
-            "degree3_linear": {"degree": 3, "regressor": sklearn.linear_model.LinearRegression()},
-            # {"degree": 3, "regressor": sklearn.linear_model.LogisticRegression()},
-        },
-        "exponential": {
-            "default": {},
-        },
-        "theta": {
-            "default": {},
-        },
-    }
-
     results = {pair: {} for pair in timeseries_pairs}
     results_path = f"{RESULTS_DIR}/results_{datetime.utcnow().strftime(TIME_FORMAT)}"
     os.makedirs(results_path)
@@ -117,7 +111,6 @@ if __name__ == "__main__":
             fh = np.arange(len(x_test)) + 1  # FIXME robust?
             x_pred = forecaster.predict(fh)
 
-
             smape_loss_result = smape_loss(x_test, x_pred)
             try:
                 results[pair][forecaster_name][forecaster_config_name] = smape_loss_result
@@ -129,6 +122,5 @@ if __name__ == "__main__":
                 plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
                 plt.title(f"{pair} {forecaster_name} {forecaster_config_name}")
                 plt.savefig(f"{results_path}/{pair}_{forecaster_name}_{forecaster_config_name}_{datetime.utcnow().strftime(TIME_FORMAT)}.png")
-    
 
     pd.DataFrame.from_dict(results).to_json(f"{results_path}/result.json", indent=4)
