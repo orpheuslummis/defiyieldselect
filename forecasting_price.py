@@ -23,8 +23,6 @@ from sktime.utils.plotting import plot_series
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 PATH_DATA_PRICES = 'data/csv/PairPrices4DEC.csv'
-PATH_DATA_ORCADEFI = 'data/data_orcadefi'
-PLATFORMS = ['aave', 'compound', 'dydx', 'fulcrum']
 BIN_PERIOD = '1h'
 RESULTS_DIR = 'results'
 TIME_FORMAT = '%Y-%m-%d_%H_%MZ'
