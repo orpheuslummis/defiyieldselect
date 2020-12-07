@@ -97,7 +97,7 @@ if __name__ == "__main__":
     for forecaster_name in forecasters:
         forecaster_combinations = itertools.product(timeseries_pairs, forecaster_configs[forecaster_name])
         for p in forecaster_combinations:
-            print(forecaster_name, *p)
+            # print(forecaster_name, *p)
             pair = p[0]
             forecaster_config = forecaster_configs[forecaster_name][p[1]]
             forecaster_config_name = p[1]
@@ -110,27 +110,12 @@ if __name__ == "__main__":
             x_pred = forecaster.predict(fh)
 
             smape_loss_result = smape_loss(x_test, x_pred)
-            try:
-                results[pair][forecaster_name][forecaster_config_name] = smape_loss_result
-            except KeyError as e:
-                results[pair][forecaster_name] = {}
-                results[pair][forecaster_name][forecaster_config_name] = smape_loss_result
+            results[pair][f"{forecaster_name}_{forecaster_config_name}"] = smape_loss_result    
 
-            if os.getenv("PLOTS") == "all":
+            if os.getenv("PLOTS") == "True":
                 plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
                 plt.title(f"{pair} {forecaster_name} {forecaster_config_name}")
                 plt.savefig(f"{results_path}/{pair}_{forecaster_name}_{forecaster_config_name}_{datetime.utcnow().strftime(TIME_FORMAT)}.png")
                 plt.close()
 
     pd.DataFrame.from_dict(results).to_json(f"{results_path}/result.json", indent=4)
-
-    if os.getenv("PLOTS") == "all" or os.getenv("PLOTS") == "results":
-        flat_results = {}
-        for key_pair in results.keys():
-            for key_forecaster in results[key_pair].keys():
-                for key_config in results[key_pair][key_forecaster].keys():
-                    flat_results[f"{key_pair}_{key_forecaster}_{key_config}"] = results[key_pair][key_forecaster][key_config]
-        plt.bar(*zip(*flat_results.items()))
-        plt.xticks(rotation='vertical')
-        # plt.show()
-        plt.savefig(f"{results_path}/results.png")
