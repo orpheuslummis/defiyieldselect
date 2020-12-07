@@ -2,7 +2,6 @@ PROJECT=defiyieldoptimization
 rsync -av --exclude .venv \
     --exclude .git \
     --exclude __pycache__ \
-    --exclude data \
     --exclude tmp \
     --exclude results \
     --exclude go \
