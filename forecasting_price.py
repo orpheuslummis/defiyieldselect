@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import sklearn
-from sklearn.ensemble import RandomForestRegressor
-from sktime.forecasting.arima import AutoARIMA
-from sktime.forecasting.compose import ReducedRegressionForecaster
-from sktime.forecasting.ets import AutoETS
+# from sklearn.ensemble import RandomForestRegressor # TODO
+# from sktime.forecasting.arima import AutoARIMA # TODO
+# from sktime.forecasting.compose import ReducedRegressionForecaster # TODO
+# from sktime.forecasting.ets import AutoETS # TODO
 from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.forecasting.naive import NaiveForecaster
@@ -28,8 +28,7 @@ PATH_DATA_ORCADEFI = 'data/data_orcadefi'
 PLATFORMS = ['aave', 'compound', 'dydx', 'fulcrum']
 BIN_PERIOD = '1h'
 RESULTS_DIR = 'results'
-os.makedirs(RESULTS_DIR, exist_ok=True)
-os.makedirs(RESULTS_DIR+"/images", exist_ok=True)
+TIME_FORMAT = '%Y-%m-%d_%H_%MZ'
 
 
 def load_data_raw():
@@ -60,11 +59,9 @@ def display_plots(timeseries_pairs):
 
 
 if __name__ == "__main__":
-    # memoization
-    try:
+    try: # memoization
         with shelve.open('data/processed_data') as db:
             timeseries_pairs = db['timeseries_pairs']
-        # print("obtained data from DB")
     except KeyError:
         timeseries_pairs = preprocess_data(load_data_raw())
         with shelve.open('data/processed_data') as db:
@@ -72,60 +69,66 @@ if __name__ == "__main__":
     
     forecasters = {
         "naive": NaiveForecaster,
-        "poly": PolynomialTrendForecaster
-        # ExponentialSmoothing,
+        "poly": PolynomialTrendForecaster,
+        "exponential": ExponentialSmoothing,
+        "theta": ThetaForecaster,
         # AutoETS,
         # AutoARIMA,
-        # ThetaForecaster,
     }
-
-    regressors = [
-        sklearn.linear_model.LinearRegression(),
-        sklearn.linear_model.LogisticRegression(),
-    ]
 
     forecaster_configs = {
-        "naive": [
-            {"strategy": "last"},
-            {"strategy": "mean"},
-            {"strategy": "drift"},
-            # try out this 
-            # try out that
-        ],
-        "poly": [
-            {"degree": 1},
-            {"degree": 2},
-            {"degree": 3},
-            # try ths out 
-            # thy asd;lfjkasd;lfkj a;sdlkfj 
-        ]
+        "naive": {
+            "last": {"strategy": "last"},
+            "mean": {"strategy": "mean"},
+            "drift": {"strategy": "drift"},
+        },
+        "poly": {
+            "degree1_linear": {"degree": 1, "regressor": sklearn.linear_model.LinearRegression()},
+            # {"degree": 1, "regressor": sklearn.linear_model.LogisticRegression()},
+            "degree2_linear": {"degree": 2, "regressor": sklearn.linear_model.LinearRegression()},
+            # {"degree": 2, "regressor": sklearn.linear_model.LogisticRegression()},
+            "degree3_linear": {"degree": 3, "regressor": sklearn.linear_model.LinearRegression()},
+            # {"degree": 3, "regressor": sklearn.linear_model.LogisticRegression()},
+        },
+        "exponential": {
+            "default": {},
+        },
+        "theta": {
+            "default": {},
+        },
     }
 
-    results = {}
+    results = {pair: {} for pair in timeseries_pairs}
+    results_path = f"{RESULTS_DIR}/results_{datetime.utcnow().strftime(TIME_FORMAT)}"
+    os.makedirs(results_path)
+
     for forecaster_name in forecasters:
-        forecaster_combinations = itertools.product(timeseries_pairs, regressors, forecaster_configs[forecaster_name])
+        forecaster_combinations = itertools.product(timeseries_pairs, forecaster_configs[forecaster_name])
         for p in forecaster_combinations:
             print(forecaster_name, *p)
             pair = p[0]
-            regressor = p[1]
-            regressor_name = regressor.__class__.__name__
-            forecaster_config = p[2]
-            forecaster = forecasters[forecaster_name](regressor, **forecaster_config)
+            forecaster_config = forecaster_configs[forecaster_name][p[1]]
+            forecaster_config_name = p[1]
+            forecaster = forecasters[forecaster_name](**forecaster_config)
             timeseries = timeseries_pairs[pair]
-            results[f"{pair}_{regressor_name}_{forecaster_name}"] = None
 
             x_train, x_test = temporal_train_test_split(timeseries)
             forecaster.fit(x_train)
             fh = np.arange(len(x_test)) + 1  # FIXME robust?
             x_pred = forecaster.predict(fh)
 
-            if os.getenv("YIELDS_PLOT") == "True":
-                plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
-                plt.title(f"{pair} with forecaster {forecaster_name}")
-                plt.savefig(f"{RESULTS_DIR}/images/{pair}_{forecaster_name}_{datetime.now().isoformat()}.png")
 
             smape_loss_result = smape_loss(x_test, x_pred)
-            print(f"{pair} {forecaster_namer} {regressor_namer} loss: {smape_loss_resultr}")
-            results[f"{pair}_{regressor_name}_{forecaster_name}"] = smape_loss_result
+            try:
+                results[pair][forecaster_name][forecaster_config_name] = smape_loss_result
+            except KeyError as e:
+                results[pair][forecaster_name] = {}
+                results[pair][forecaster_name][forecaster_config_name] = smape_loss_result
 
-        pd.DataFrame.from_dict(results).to_json(f"{RESULTS_DIR}/results_{datetime.now().isoformat()}.json", indent=4)
+            if os.getenv("YIELDS_PLOT") == "True":
+                plot_series(x_train, x_test, x_pred, labels=["x_train", "x_test", "x_pred"])
+                plt.title(f"{pair} {forecaster_name} {forecaster_config_name}")
+                plt.savefig(f"{results_path}/{pair}_{forecaster_name}_{forecaster_config_name}_{datetime.utcnow().strftime(TIME_FORMAT)}.png")
+    
+
+    pd.DataFrame.from_dict(results).to_json(f"{results_path}/result.json", indent=4)
