@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import sklearn
-# from sklearn.ensemble import RandomForestRegressor # TODO
-# from sktime.forecasting.arima import AutoARIMA # TODO
-# from sktime.forecasting.compose import ReducedRegressionForecaster # TODO
-# from sktime.forecasting.ets import AutoETS # TODO
+from sklearn.ensemble import RandomForestRegressor
+# from sktime.forecasting.arima import AutoARIMA
+from sktime.forecasting.compose import ReducedRegressionForecaster
+from sktime.forecasting.ets import AutoETS
 from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.forecasting.naive import NaiveForecaster
@@ -33,8 +33,9 @@ forecasters = {
     "poly": PolynomialTrendForecaster,
     "exponential": ExponentialSmoothing,
     "theta": ThetaForecaster,
-    # AutoETS,
-    # AutoARIMA,
+    # "autoets": AutoETS,
+    "reducedregression": ReducedRegressionForecaster,
+    # "autoarima": AutoARIMA,
 }
 
 forecaster_configs = {
@@ -45,18 +46,46 @@ forecaster_configs = {
     },
     "poly": {
         "degree1_linear": {"degree": 1, "regressor": sklearn.linear_model.LinearRegression()},
-        # {"degree": 1, "regressor": sklearn.linear_model.LogisticRegression()},
+        "degree1_forest": {"degree": 1, "regressor": RandomForestRegressor()},
+        "degree1_ridge": {"degree": 1, "regressor": sklearn.linear_model.Ridge()},
         "degree2_linear": {"degree": 2, "regressor": sklearn.linear_model.LinearRegression()},
-        # {"degree": 2, "regressor": sklearn.linear_model.LogisticRegression()},
+        "degree2_forest": {"degree": 2, "regressor": RandomForestRegressor()},
+        "degree2_ridge": {"degree": 2, "regressor": sklearn.linear_model.Ridge()},
+        "degree2_ridge_alpha05": {"degree": 2, "regressor": sklearn.linear_model.Ridge(alpha=0.5)},
+        "degree2_ridge_alpha025": {"degree": 2, "regressor": sklearn.linear_model.Ridge(alpha=0.25)},
         "degree3_linear": {"degree": 3, "regressor": sklearn.linear_model.LinearRegression()},
-        # {"degree": 3, "regressor": sklearn.linear_model.LogisticRegression()},
+        "degree3_forest": {"degree": 3, "regressor": RandomForestRegressor()},
     },
     "exponential": {
         "default": {},
+        "damped": {"damped": True},
+        "trend_add": {"trend": "add"},
+        "trend_mul": {"trend": "mul"},
+        "remove_bias": {"remove_bias": True},
+        "sp60": {"sp": 60},
     },
     "theta": {
         "default": {},
+        "sp80": {"sp": 80},
+        "sp100": {"sp": 100},
+        "sp40": {"sp": 40},
+        "sp60": {"sp": 60},
+        "smooth05": {"smoothing_level": 0.5},
+        "smooth1": {"smoothing_level": 1},
+        "smooth2": {"smoothing_level": 2},
     },
+    # "autoets": {
+    #     "default": {},
+    # },
+    # "autoarima": {
+    #     "default": {},
+    # }
+    "reducedregression": {
+        "forest": {"regressor": RandomForestRegressor()},
+        "forest_wl20": {"regressor": RandomForestRegressor(), "window_length": 20},
+        "forest_wl30": {"regressor": RandomForestRegressor(), "window_length": 30},
+        "forest_wl100": {"regressor": RandomForestRegressor(), "window_length": 100},
+    }
 }
 
 
@@ -85,7 +114,7 @@ if __name__ == "__main__":
     try: # memoization
         with shelve.open('data/processed_data') as db:
             timeseries_pairs = db['timeseries_pairs']
-    except KeyError:
+    except Exception as e:
         timeseries_pairs = preprocess_data(load_data_raw())
         with shelve.open('data/processed_data') as db:
             db['timeseries_pairs'] = timeseries_pairs
@@ -97,7 +126,7 @@ if __name__ == "__main__":
     for forecaster_name in forecasters:
         forecaster_combinations = itertools.product(timeseries_pairs, forecaster_configs[forecaster_name])
         for p in forecaster_combinations:
-            # print(forecaster_name, *p)
+            print(forecaster_name, *p)
             pair = p[0]
             forecaster_config = forecaster_configs[forecaster_name][p[1]]
             forecaster_config_name = p[1]
