@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     results = {pair: {} for pair in timeseries_pairs}
     results_path = f"{RESULTS_DIR}/results_{datetime.utcnow().strftime(TIME_FORMAT)}"
-    os.makedirs(results_path)
+    os.makedirs(results_path, exist_ok=True)
 
     for forecaster_name in forecasters:
         forecaster_combinations = itertools.product(timeseries_pairs, forecaster_configs[forecaster_name])
