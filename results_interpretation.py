@@ -1,8 +1,13 @@
+# TODO interpretation in terms of USD profit over the test set
+# TODO aggregate information across runs
+
 import json
 import os
-import matplotlib.pyplot as plt
-import pandas as pd
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 RESULTS_DIR = 'results'
 
@@ -47,29 +52,34 @@ def plot_results(results):
     plt.savefig(f"{results_path}/results.png")
 
 
-def results_distribution_per_config(results):
-    pass
-
-
 def print_stats(df: pd.DataFrame):
-    # print("rows")
-    # [print(row) for row in df.]
+    print("~ mean smape loss per forecaster_config, across all pairs ~")
+    print(df.mean(axis=1).sort_values().to_string(), '\n')
 
-    print("~ mean loss per pair, accross all forecaster_config ~")
-    print(df.mean().sort_values(), '\n')
+    # print("~ mean smape loss per pair, across all forecaster_configs ~")
+    # print(df.mean().sort_values().to_string(), '\n')
+    
 
-    print("~ mean loss per forecaster_config ~")
-    print(df.mean(axis=1).sort_values(), '\n')
+def print_results_matrix(df: pd.DataFrame):
+    print("the results matrix")
+    print(df.to_string())
+
+
+def heatmap(df: pd.DataFrame):
+    # TODO make the render nicer
+    plt.pcolor(df)
+    plt.yticks(np.arange(0.5, len(df.index), 1), df.index)
+    plt.xticks(np.arange(0.5, len(df.columns), 1), df.columns)
+    plt.show()
+
 
 
 if __name__ == "__main__":
     # results = obtain_latest_results_json()
-
     # print(flatten_results(results))
-
     # print_descending_loss(results)
-
     # print(results_distribution_per_config(results))
 
     resultsdf = obtain_latest_results_dataframe()
     print_stats(resultsdf)
+    # heatmap(resultsdf)
