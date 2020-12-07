@@ -1,9 +1,7 @@
 import csv
 import logging
-import os
 import sched
 import sys
-import time
 
 import requests
 
@@ -19,8 +17,8 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOi
 API_URL = "http://orcadefi.com:10000/api/v1/realtime/"
 
 
-def collect_data(token):
-    query = f"{API_URL}all?token={token}"
+def collect_data():
+    query = f"{API_URL}all?token={TOKEN}"
 
     try:
         response = requests.get(url=query)
@@ -47,20 +45,20 @@ def collect_data(token):
         return
         
 
-
-def trigger_collection(token, sc):
-    collect_data(token)
-    s.enter(seconds, 1, trigger_collection, argument=(token, seconds,))
-    s.run()
+def collection_loop(seconds, scheduler=None):
+    if scheduler is not None:
+        scheduler.enter(seconds, 1, collection_loop, ([seconds, scheduler]))
+        collect_data()
+    elif scheduler is None:
+        scheduler = sched.scheduler()
+        scheduler.enter(seconds, 1, collection_loop, ([seconds, scheduler]))
+        scheduler.run()
 
 
 if __name__ == "__main__":
-    # os.makedirs(PATH, exist_ok=True) # should exist already because of the Docker setup
-    s = sched.scheduler(time.time, time.sleep)
-
     try:
         seconds = int(sys.argv[1])
     except IndexError as e:
         seconds = INTERVAL
 
-    trigger_collection(TOKEN, seconds)
+    collection_loop(seconds)
