@@ -4,9 +4,14 @@ services:
     build: .
     command: python datacollect/collect_orcadefi.py
     volumes: [data_vol:/data/]
+  forecasting:
+    build: .
+    command: python forecasting_price.py
+    volumes: [results_vol:/results/]
   # collect_yieldfi: # just to run as one-off job, occasionally
   #   build: .
   #   command: python datacollect/collect_yieldfi.py
   #   volumes: [data_vol:/data/]
 volumes:
   data_vol:
+  results_vol:
