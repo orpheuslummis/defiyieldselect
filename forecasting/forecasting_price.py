@@ -10,6 +10,7 @@ import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestRegressor
 # from sktime.forecasting.arima import AutoARIMA
+from sklearn.neighbors import KNeighborsRegressor
 from sktime.forecasting.compose import ReducedRegressionForecaster
 from sktime.forecasting.ets import AutoETS
 from sktime.forecasting.exp_smoothing import ExponentialSmoothing
@@ -20,11 +21,13 @@ from sktime.forecasting.trend import PolynomialTrendForecaster
 from sktime.performance_metrics.forecasting import smape_loss
 from sktime.utils.plotting import plot_series
 
+import forecasters
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-PATH_DATA_PRICES = 'data/csv/PairPrices4DEC.csv'
+PATH_DATA_PRICES = 'data/bowhead_csvs/PairPrices4DEC.csv'
 BIN_PERIOD = '1h'
-RESULTS_DIR = 'results'
+RESULTS_DIR = os.getenv('RESULTS_DIR', 'results')
 TIME_FORMAT = '%Y-%m-%d_%H_%MZ'
 
 
@@ -58,7 +61,7 @@ forecaster_configs = {
     },
     "exponential": {
         "default": {},
-        "damped": {"damped": True},
+        # "damped": {"damped": True},
         "trend_add": {"trend": "add"},
         "trend_mul": {"trend": "mul"},
         "remove_bias": {"remove_bias": True},
@@ -85,6 +88,11 @@ forecaster_configs = {
         "forest_wl20": {"regressor": RandomForestRegressor(), "window_length": 20},
         "forest_wl30": {"regressor": RandomForestRegressor(), "window_length": 30},
         "forest_wl100": {"regressor": RandomForestRegressor(), "window_length": 100},
+        "kneighbors1": {"regressor": KNeighborsRegressor(n_neighbors=1)},
+        "kneighbors2": {"regressor": KNeighborsRegressor(n_neighbors=2)},
+        "kneighbors3": {"regressor": KNeighborsRegressor(n_neighbors=3)},
+        "kneighbors4": {"regressor": KNeighborsRegressor(n_neighbors=4)},
+        "kneighbors5": {"regressor": KNeighborsRegressor(n_neighbors=5)},
     }
 }
 

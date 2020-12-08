@@ -10,4 +10,5 @@ tmp/
 images/
 .DS_Store
 results/
+results_dl/
 .idea

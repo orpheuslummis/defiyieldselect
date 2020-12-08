@@ -8,6 +8,7 @@ services:
     build: .
     command: python forecasting_price.py
     volumes: [results_vol:/results/]
+    env_file: env.list
   # collect_yieldfi: # just to run as one-off job, occasionally
   #   build: .
   #   command: python datacollect/collect_yieldfi.py
