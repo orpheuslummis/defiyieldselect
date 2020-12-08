@@ -4,7 +4,8 @@ venv
 jupyter/.ipynb_checkpoints/
 .vscode
 datacollect/data/*
-data/
+data/*
+!data/bowhead_csvs/
 tmp/
 images/
 .DS_Store
