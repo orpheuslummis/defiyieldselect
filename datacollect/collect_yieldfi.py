@@ -4,7 +4,6 @@ historical APR data from yield.fi
 NOTE that this API might not be reliable in terms of data quality and future availability
 """
 
-# TODO support simultaneously local and docker 
 # TODO query only what is needed, not everything
 
 import datetime
@@ -20,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 API_URL = "https://api.yield.fi/lending/rate"
-PATH = "data" # local
+PATH = os.getenv(DATA_DIR, "data")
 GRANULARITY = "1h"
 
 
