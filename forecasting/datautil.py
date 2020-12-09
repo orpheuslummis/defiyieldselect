@@ -1,10 +1,13 @@
 import pandas as pd
+import shelve
 
 import config
 
+DATA_PATH = 'data'
+
 
 datas = {
-    "bowhead_prices": "data/bowhead_csvs/PairPrices4DEC.csv"
+    "bowhead_prices": f"{DATA_PATH}/bowhead_csvs/PairPrices4DEC.csv"
 }
 
 
@@ -16,6 +19,20 @@ def load_data_raw(data_name):
         timeseries = pd.Series(list(df['Price']), index=df['Time'])
         timeseries_pairs[pair] = timeseries
     return timeseries_pairs
+
+
+def load_data_memoized(data_name):
+    # TODO include a preprocessor callback, then memoized the result of loading+preprocessing
+    dbpath = f'{DATA_PATH}/preprocessed_datas.db'
+    try:
+        with shelve.open(dbpath) as db:
+            data = db[data_name]
+    except Exception as e:
+        raw_data = load_data_raw(data_name)
+        data = preprocess_data(raw_data)
+        with shelve.open(dbpath) as db:
+            db[data_name] = data
+    return data
 
 
 def preprocess_data(data): # TODO make more general than just for specificially for bowhead_prices

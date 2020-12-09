@@ -17,14 +17,7 @@ import models
 
 
 if __name__ == "__main__":
-    try: # memoization
-        with shelve.open('data/preprocessed_datas.db') as db:
-            timeseries_pairs = db['timeseries_pairs']
-    except Exception as e:
-        raw_data = datautil.load_data_raw('bowhead_prices')
-        timeseries_pairs = datautil.preprocess_data(raw_data)
-        with shelve.open('data/preprocessed_datas.db') as db:
-            db['timeseries_pairs'] = timeseries_pairs
+    timeseries_pairs = datautil.load_data_memoized('bowhead_prices')
     
     results = {pair: {} for pair in timeseries_pairs}
     results_path = f"{RESULTS_DIR}/results_{datetime.utcnow().strftime(TIME_FORMAT)}"
