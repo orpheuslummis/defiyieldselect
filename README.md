@@ -1,29 +1,27 @@
 ## tasks
 
-TODO unpack the concept of 'swap' to customer
+unpack the concept of 'swap' to customer
 
-TODO what the customer wants
+what the customer wants
 
-TODO transition to sktime benchmarking, using orchestrator
+transition to sktime benchmarking, using orchestrator
 
-TODO more composite models
+more composite models
 
-TODO forecasting pipeline for yieldfi historical data
+forecasting pipeline for yieldfi historical data
 
-TODO forecasting pipeline for live APR data
+forecasting pipeline for live APR data
 
-TODO merging of pipelines
+merging of pipelines
 
-TODO hyperparameter search for seasonality in Theta
+Deseasonalizer
 
-TODO Deseasonalizer
+TransformedTargetForecaster
 
-TODO TransformedTargetForecaster
+online forecasting
 
-TODO online forecasting
+interpreation of SMAPE loss https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
-TODO interpreation of SMAPE loss https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
+temporal cross-validation scheme
 
-TODO temporal cross-validation scheme
-
-TODO multi-core processing
+multi-core processing
