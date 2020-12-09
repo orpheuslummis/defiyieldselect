@@ -24,7 +24,7 @@ TODO TransformedTargetForecaster
 
 TODO online forecasting
 
-TODO interpreation of SMAPE loss
+TODO interpreation of SMAPE loss https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
 
 
 

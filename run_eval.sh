@@ -1,0 +1,1 @@
+python forecasting/forecasting_price.py && python forecasting/results_interpretation.py
