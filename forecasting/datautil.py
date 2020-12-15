@@ -7,7 +7,8 @@ DATA_PATH = 'data'
 
 
 datas = {
-    "bowhead_prices": f"{DATA_PATH}/bowhead_csvs/PairPrices4DEC.csv"
+    "bowhead_prices": f"{DATA_PATH}/bowhead_csvs/PairPrices4DEC.csv",
+    "bowhead_lend": f"{DATA_PATH}/bowhead_csvs/Lend4DEC.csv" 
 }
 
 
@@ -44,3 +45,12 @@ def preprocess_data(data): # TODO make more general than just for specificially 
         # resampling to have constant sampling rate for broad compatibility
         timeseries_pairs[pair] = timeseries.resample(config.BIN_PERIOD).bfill()
     return timeseries_pairs
+
+
+def load_lend_data(): # dict of Series
+    data_raw = pd.read_csv(datas["bowhead_lend"], parse_dates=['Time'])
+    tokens = ['DUSDC', 'DSAI', 'DETH','DDAI']
+    data = {}
+    for t in tokens:
+        data[t] = pd.Series(list(data_raw[f'{t}.1']), index=data_raw['Time'])
+    return data
