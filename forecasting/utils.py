@@ -1,5 +1,5 @@
 import pandas as pd
-import matplotib.pyplot as plt
+import matplotlib.pyplot as plt
 import datautil
 
 
@@ -23,3 +23,10 @@ def print_orcadefi_data(asset, pair, kind):
 def display_data_plots():
     data = load_data_raw()
     # TODO
+
+
+def plot_lend_datas():
+    data_lend = datautil.load_lend_data()
+    for t in data_lend:
+        plt.plot(data_lend[t])
+        plt.show()
