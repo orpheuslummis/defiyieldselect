@@ -1,72 +1,27 @@
 TODO
 ====
 
+1. TODO load pair data for forecasting and benchmark
 
-tasks
------
-
-output: swap opportunities ordered by expected profit, every minute
-
-write the README
+    .load()
+    y = data[task.target]
 
 
-
-extras
------
-
-accumulate decision data and benchmark the results
-
-unpack the concept of 'swap' to customer
-
-transition to sktime benchmarking, using orchestrator
-
-more composite models
-
-forecasting pipeline for yieldfi historical data,  forecasting pipeline for live APR data, then merging of pipelines
-
-Deseasonalizer
-
-TransformedTargetForecaster
-
-OnlineEnsembleForecaster with NormalHedgeEnsemble
-
-interpreation of SMAPE loss https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
-
-temporal cross-validation scheme
-
-multi-core processing
-
-all_estimators
-
-writing results to UEA format
-
-autocorrelation to find seasonality
-
-tryout various forecasting horizons
-
-using TSInterpolator instead of pandas resampling
-
-prediction intervals
-
-most reliable data: directly from the blockchain, or subgraph?
+2. TODO basic forecasting
 
 
-benchmarking
-------------
+
+3. TODO output (2 curves -> multiplier curve -> score)
+
+4. TODO model+parameter search per curve
+
+5. TODO forecasting with best top-n ensemble per curve
+
+6. TODO README
+
+7. TODO integrate with API
 
 
-UEADataset
-    TBD
+TODO output with 'last-updated' field
 
-TSCStrategy
-    TBD
-
-HDDResults
-    TBD
-
-Orchestrator
-    TBD
-
-
-Evaluator
-    TBD
+TODO just use linear regression

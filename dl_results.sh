@@ -1,2 +1,0 @@
-ssh -t equivos@45.56.67.145 "docker run --rm -v defiyieldoptimization_results_vol:/results/ -v \$HOME/results/:/tmp/results/ -i -t ubuntu bash -c 'cp -r /results/* /tmp/results/'"
-rsync -av equivos@45.56.67.145:results/ results_dl/

@@ -36,15 +36,16 @@ if __name__ == "__main__":
             
             pair = p[0]
             timeseries = timeseries_pairs[pair]
+            # x_train, x_test = temporal_train_test_split(timeseries)
             x_train, x_test = temporal_train_test_split(timeseries)
-
             forecaster_config_name = p[1]
             forecaster_config = forecaster_configs[forecaster_name][p[1]]
             forecaster = forecasters[forecaster_name](**forecaster_config)
-            print(f"{x_test=}")
-            horizon = np.arange(len(x_test)) + 1
-            forecaster.fit(x_train, fh=horizon)
-            x_pred = forecaster.predict()
+            # print(f"{x_test=}")
+            # horizon = np.arange(len(x_test)) + 1
+            horizon = ForecastingHorizon(x_test.index, is_relative=False)
+            forecaster.fit(x_train)
+            x_pred = forecaster.predict(fh=horizon)
             results[pair][f"{forecaster_name}_{forecaster_config_name}"] = smape_loss(x_test, x_pred)
             results_paramsearch[f"{forecaster_name}_{forecaster_config_name}"] = forecaster.cv_results_  
 

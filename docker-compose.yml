@@ -1,17 +1,22 @@
 version: "3.8"
 services:
-  collect_orcadefi:
-    build: .
-    command: python datacollect/collect_orcadefi.py
-    volumes: [data_vol:/data/]
   forecasting:
     build: .
-    command: python forecasting/forecasting_price.py
-    volumes: [results_vol:/results/]
+    command: python forecasting/run.py
+    volumes:
+      - results_vol:/results/
+      - data_vol:/data/
     env_file: env.list
-  # collect_yieldfi: # just to run as one-off job, occasionally
+  # modelsearch:
   #   build: .
-  #   command: python datacollect/collect_yieldfi.py
+  #   command: python modelsearch/run.py
+  #   volumes:
+  #     - results_vol:/results/
+  #     - data_vol:/data/
+  #   env_file: env.list
+  # collect_orcadefi:
+  #   build: .
+  #   command: python datacollect/collect_orcadefi.py
   #   volumes: [data_vol:/data/]
 volumes:
   data_vol:

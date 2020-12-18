@@ -20,13 +20,8 @@ def print_orcadefi_data(asset, pair, kind):
     print(data.head())
 
 
-def display_data_plots():
-    data = load_data_raw()
-    # TODO
-
-
-def plot_lend_datas():
-    data_lend = datautil.load_lend_data()
-    for t in data_lend:
-        plt.plot(data_lend[t])
-        plt.show()
+def plot_timeseries():
+    ts_apr = datautil.get_ts_apr()
+    print(ts_apr)
+    ts_price = datautil.get_ts_price()
+    print(ts_price)

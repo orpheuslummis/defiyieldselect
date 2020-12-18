@@ -1,6 +1,8 @@
 """
 historical APR data from yield.fi
 
+TODO collecting daily
+
 NOTE that this API might not be reliable in terms of data quality and future availability
 """
 
