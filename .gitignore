@@ -5,6 +5,7 @@ __pycache__
 .vscode
 data/*
 !data/bowhead_historical/
+!data/bowhead/
 datacollect/data/*
 docs/_build/
 etc/
