@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+import dataloader
+import forecast_value_univariate as forecast
+
 RESULTS_DIR = 'results'
 
 
@@ -75,6 +78,21 @@ def heatmap(df: pd.DataFrame):
     plt.show()
 
 
+def visualize_all() -> None:
+    for pair in dataloader.list_pairs():
+        # for col in data.columns:
+        #     plt.title(f'{pair} {col}')
+        #     data[col].plot()
+        #     plt.show()
+        predictions, predictions_features = forecast.forecast_pair(pair)
+        predictions['value'].plot()
+        plt.title(f'{pair} value')
+        plt.show()
+        for feature in predictions_features:
+            predictions_features[feature].plot()
+            plt.title(f'{pair} {feature}')
+            plt.show()
+
 
 if __name__ == "__main__":
     # results = obtain_latest_results_json()
@@ -85,3 +103,4 @@ if __name__ == "__main__":
     # resultsdf = obtain_latest_results_dataframe()
     # print_stats(resultsdf)
     # heatmap(resultsdf)
+    pass
