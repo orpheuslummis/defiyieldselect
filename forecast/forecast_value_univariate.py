@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 import dataloader
-import modelA
+import models
 import value
 from config import *
 
@@ -25,7 +25,7 @@ def forecast_pair(pair: str) -> (dict, dict):
     predictions = {}
     predictions_features = {}
     data = dataloader.get_pair_data(pair)
-    forecaster = modelA.F1
+    forecaster = models.F1
     for feature in data.columns:
         forecaster.fit(data[feature])
         predictions_features[feature] = forecaster.predict(fh=np.arange(1, TIMESTEP_HORIZON+1))

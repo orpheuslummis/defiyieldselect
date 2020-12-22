@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import dataloader
-import forecast_value_univariate as forecast
+import forecast.dataloader
+import forecast.forecast_value_univariate as forecast
 
 RESULTS_DIR = 'results'
 
