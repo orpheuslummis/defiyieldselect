@@ -12,4 +12,5 @@ def value(data: pd.DataFrame) -> pd.Series:
     output: timeseries of (value + compounded_interested(t))
     '''
     apr_multiplier = (data['apr'] * PERIOD_IN_YEARS[TIMESTEP_PERIOD]) + 1
-    return apr_multiplier.cumprod() * data['price']
+    value_pred = apr_multiplier.cumprod() * data['price']
+    return value_pred

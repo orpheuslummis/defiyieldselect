@@ -7,17 +7,21 @@ from sktime.forecasting.model_selection import temporal_train_test_split
 from config import *
 
 
-def list_pairs():
+def pairs():
     ls = sorted(Path(f'{DATA_PATH}/bowhead/').glob('*.csv'))
     return set([f.stem.split('_')[0] for f in ls])
 
 
 def get_pair_data_train(pair: str) -> pd.DataFrame:
-    ...
+    data = get_pair_data(pair)
+    data_train, data_test = temporal_train_test_split(data, train_size=0.8)
+    return data_train
 
 
 def get_pair_data_test(pair: str) -> pd.DataFrame:
-    ...
+    data = get_pair_data(pair)
+    data_train, data_test = temporal_train_test_split(data, train_size=0.8)
+    return data_test
 
 
 def get_pair_data(pair: str) -> pd.DataFrame:

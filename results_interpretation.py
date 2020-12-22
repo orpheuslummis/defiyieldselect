@@ -79,7 +79,7 @@ def heatmap(df: pd.DataFrame):
 
 
 def visualize_all() -> None:
-    for pair in dataloader.list_pairs():
+    for pair in dataloader.pairs():
         # for col in data.columns:
         #     plt.title(f'{pair} {col}')
         #     data[col].plot()
