@@ -30,11 +30,11 @@ from datautil import BowheadHistoricalDataset
 DATA_PATH='data'
 RESULTS_PATH='results1'
 
-datasets = [
+datasets = [ # TODO one dataset per timeseries <pair> X price X apr
     BowheadHistoricalDataset(path=f'{DATA_PATH}/bowhead/', name="bowhead")
 ]
 
-strategies = [
+strategies = [ # TODO make a strategy for all the activated models in models
     TSRStrategy(TimeSeriesForestRegressor(n_estimators=10), name="tsf"),
     # TODO models here
 ]
@@ -48,5 +48,23 @@ orchestrator = Orchestrator(
 )
 orchestrator.fit_predict(save_fitted_strategies=False, overwrite_predictions=True)
 
-# model experiments
+# TODO model experiments
 
+
+
+# evaluator = Evaluator(results)
+# metric = PairwiseMetric(func=accuracy_score, name="accuracy")
+# metrics_by_strategy = evaluator.evaluate(metric=metric)
+# metrics_by_strategy.head()
+
+# evaluator.rank()
+
+# evaluator.plot_boxplots()
+# evaluator.ranks()
+# evaluator.t_test()
+# evaluator.sign_test()
+# evaluator.ranksum_test()
+# evaluator.t_test_with_bonferroni_correction()
+# evaluator.wilcoxon_test()
+# evaluator.friedman_test()
+# evaluator.nemenyi()
