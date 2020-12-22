@@ -16,7 +16,6 @@ sktime = "^0.4.3"
 tsfresh = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
-ipykernel = "^5.3.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
