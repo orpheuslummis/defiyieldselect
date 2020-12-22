@@ -1,15 +1,15 @@
 version: "3.8"
 services:
-  forecasting:
+  forecast:
     build: .
-    command: python forecasting/run.py
+    command: python forecast/run.py
     volumes:
       - results_vol:/results/
       - data_vol:/data/
     env_file: env.list
   # modelsearch:
   #   build: .
-  #   command: python modelsearch/run.py
+  #   command: python forecast/modelsearch.py
   #   volumes:
   #     - results_vol:/results/
   #     - data_vol:/data/
