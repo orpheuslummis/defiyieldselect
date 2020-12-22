@@ -1,27 +1,30 @@
+.. role:: bash(code)
+   :language: bash
+
 README
 ======
 
 how to use this
 ---------------
 
-Run: `docker-compose up --build`
+Run: :bash:`docker-compose up --build`
 
 With the following parameter to input in the `env.list` file:
 
-- `TIMESTEP_INTERVAL=1h` resampling interval
-- `TIMESTEP_HORIZON=722` number of future timesteps to compute
+- :bash:`TIMESTEP_INTERVAL=1h` resampling interval
+- :bash:`TIMESTEP_HORIZON=722` number of future timesteps to compute
 
-Run it with docker-compose. It has the following containers:
+Run it with :bash:`docker-compose`. It has the following containers:
 
-- `forecasting`: fit and predict future value of swap
-- `modelsearch`: perform hyperparameter search 
-- `collect_orcadefi`: every minute, collect orcadefi data API into the data volume
+- :bash:`forecasting`: fit and predict future value of swap
+- :bash:`modelsearch`: perform hyperparameter search 
+- :bash:`collect_orcadefi`: every minute, collect orcadefi data API into the data volume
 
 To run locally:
 
-1. `poetry install` or `pip install -r requirements.txt`
-2. `source .venv/bin/activate`
-3. `python src/run.py`
+1. :bash:`poetry install` or `pip install -r requirements.txt`
+2. :bash:`source .venv/bin/activate`
+3. :bash:`python src/run.py`
 
 
 the approach
