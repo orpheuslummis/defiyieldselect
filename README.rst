@@ -9,7 +9,7 @@ how to use this
 
 Run: :bash:`docker-compose up --build`
 
-With the following parameter to input in the `env.list` file:
+With the following parameter to input in the :bash:`env.list` file:
 
 - :bash:`TIMESTEP_INTERVAL=1h` resampling interval
 - :bash:`TIMESTEP_HORIZON=722` number of future timesteps to compute
