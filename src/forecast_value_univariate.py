@@ -32,9 +32,3 @@ def forecast_pair(pair: str) -> (dict, dict):
     predictions['value'] = value.value(predictions_features)
     predictions['score'] =  score(predictions['value'])
     return predictions, predictions_features
-
-
-if __name__ == "__main__":
-    pairs = dataloader.list_pairs()
-    predictions = {pair: forecast_pair(pair) for pair in pairs}
-    print(predictions)

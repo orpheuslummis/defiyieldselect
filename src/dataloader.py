@@ -7,13 +7,6 @@ from sktime.forecasting.model_selection import temporal_train_test_split
 from config import *
 
 
-data_files = {
-    "bowhead_price": f"{DATA_PATH}/bowhead_historical/price.csv",
-    "bowhead_apr": f"{DATA_PATH}/bowhead_historical/lend.csv",
-    "bowhead_dir": f"{DATA_PATH}/bowhead/",
-}
-
-
 def list_pairs():
     ls = sorted(Path(f'{DATA_PATH}/bowhead/').glob('*.csv'))
     return set([f.stem.split('_')[0] for f in ls])
@@ -42,7 +35,7 @@ def get_pair_data(pair: str) -> pd.DataFrame:
 
 
 def normalize_data(data: pd.DataFrame) -> pd.DataFrame:
-    ...
+    ... #TODO
 
 
 def horizon_of_pair(data: pd.DataFrame) -> int:

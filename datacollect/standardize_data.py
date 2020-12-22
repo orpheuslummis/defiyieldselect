@@ -1,4 +1,4 @@
-# from the bowhead csv files to nice csvs
+# from the bowhead csv files to tidied csvs
 
 import pandas as pd
 import os
@@ -59,7 +59,6 @@ if __name__ == "__main__":
         # df = df.resample(TIMESTEP_PERIOD).bfill()
         print(pair, df)
         df.to_csv(f'{DATA_PATH}/bowhead/{pair}.csv')
-        # FIXME NaNs
 
         # print(f'{pair} apr\n{data_apr[pair]}')
         # print(f'{pair} price\n{data_price[pair]}')

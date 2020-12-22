@@ -17,7 +17,7 @@ F2 = EnsembleForecaster([
         ('rr_linear_wl21', ReducedRegressionForecaster(LinearRegression(), window_length=21)),
         ('rr_linear_wl28', ReducedRegressionForecaster(LinearRegression(), window_length=28)),
     ])
-    
+
 
 models = {
     'f1': F1,
