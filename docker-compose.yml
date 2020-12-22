@@ -2,14 +2,14 @@ version: "3.8"
 services:
   # forecast:
   #   build: .
-  #   command: python forecast/run.py
+  #   command: python src/run.py
   #   volumes:
   #     - results_vol:/results/
   #     - data_vol:/data/
   #   env_file: env.list
   modelsearch:
     build: .
-    command: python forecast/modelsearch.py
+    command: python src/modelsearch.py
     volumes:
       - results_vol:/results/
       - data_vol:/data/
