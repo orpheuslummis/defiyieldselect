@@ -1,19 +1,19 @@
 version: "3.8"
 services:
-  forecast:
-    build: .
-    command: python forecast/run.py
-    volumes:
-      - results_vol:/results/
-      - data_vol:/data/
-    env_file: env.list
-  # modelsearch:
+  # forecast:
   #   build: .
-  #   command: python forecast/modelsearch.py
+  #   command: python forecast/run.py
   #   volumes:
   #     - results_vol:/results/
   #     - data_vol:/data/
   #   env_file: env.list
+  modelsearch:
+    build: .
+    command: python forecast/modelsearch.py
+    volumes:
+      - results_vol:/results/
+      - data_vol:/data/
+    env_file: env.list
   # collect_orcadefi:
   #   build: .
   #   command: python datacollect/collect_orcadefi.py

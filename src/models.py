@@ -4,6 +4,7 @@ from sktime.base import BaseEstimator
 from sktime.forecasting.compose import (EnsembleForecaster,
                                         ReducedRegressionForecaster)
 from sktime.regression.compose import TimeSeriesForestRegressor
+from sktime.forecasting.theta import ThetaForecaster
 
 
 basic_regressor = LinearRegression()
@@ -11,8 +12,7 @@ basic_regressor = LinearRegression()
 
 F1 = EnsembleForecaster([
         ('rr_linear_wl5', ReducedRegressionForecaster(LinearRegression(), window_length=5)),
-        # ('rr_linear_wl21', ReducedRegressionForecaster(LinearRegression(), window_length=21)),
-        # ('rr_linear_wl28', ReducedRegressionForecaster(LinearRegression(), window_length=28)),
+        ('theta_sp?', ThetaForecaster(sp=1)),
     ])
 
 
@@ -21,5 +21,5 @@ models = {
 }
 
 def all_models() -> list[(str, BaseEstimator)]:
-    # TODO or select all the objects that are of type EnsembleForecaster in this module
+    # TODO or select all the objects that are of type Forecaster? in this module
     return models.items()

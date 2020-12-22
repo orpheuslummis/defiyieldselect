@@ -33,11 +33,13 @@ It is univariate regression: we train an estimator for each timeseries - price, 
 
 The 1h default resampling interval is to allow the forecasting up to 1 month in 722 steps to be tractable (vs 43444 steps with an interval of 1min).
 
-status: using historical data provided by Bowhead, not polling the API
+The estimator used is an ensemble resulting of a quick hyperparameter search.
 
 
 notes
 -----
+
+status: using historical data provided by Bowhead, not polling the API
 
 The reason why we don't include a target column in the data is that we fix the base multiplier (1) to be the latest data. In other words, latest data point is used as reference point (1) to calculate the target multiplier.
 

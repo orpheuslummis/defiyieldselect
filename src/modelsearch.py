@@ -3,27 +3,41 @@
 import itertools
 import numpy as np
 from pathlib import Path
+import time
+import json
 
 from sktime.forecasting.compose import ReducedRegressionForecaster
 from sktime.forecasting.model_selection import (ForecastingGridSearchCV,
                                                 SlidingWindowSplitter)
 from sktime.performance_metrics.forecasting import smape_loss
+from sktime.forecasting.theta import ThetaForecaster
 
 import dataloader
 import models
 
+#FIXME initial_window= 
+
 
 def rrf_wl() -> ForecastingGridSearchCV:
-    regressor = models.basic_regressor
-    forecaster = ReducedRegressionForecaster(regressor=regressor, window_length=1, strategy="recursive")
-    param_grid = {"window_length": list(range(5, 50, 5))}
-    cv = SlidingWindowSplitter(initial_window=int(100))  #FIXME 100
-    return ForecastingGridSearchCV(forecaster, cv=cv, param_grid=param_grid)
+    return ForecastingGridSearchCV(
+        forecaster=ReducedRegressionForecaster(regressor=models.basic_regressor, window_length=1, strategy="recursive"),
+        cv=SlidingWindowSplitter(initial_window=int(100)),
+        param_grid={"window_length": list(range(5, 50, 5))}
+    ) # best_params = 5
+
+
+def theta_sp() -> ForecastingGridSearchCV:
+    return ForecastingGridSearchCV(
+        forecaster=ThetaForecaster(),
+        cv=SlidingWindowSplitter(initial_window=int(100)),
+        param_grid={"sp": range(5,50,5)}
+    ) # best_params = 
 
 
 # models we perform an hyperparameter for
 M = {
     'rrf_wl': rrf_wl(),
+    'theta_sp': theta_sp(),
 }
 
 
@@ -47,14 +61,15 @@ def run_experiments() -> dict:
                 pred = M[m].predict(X=test, fh=horizon)
                 results[pair][m][feature]['best_params'] = M[m].best_params_
                 results[pair][m][feature]['smape_loss'] = smape_loss(test, pred)
-
-    print(results)
     return results
 
 
-def results_to_csvfile(path: Path, results: dict) -> None:
-    ...
+def results_to_json(path: Path, results: dict) -> None:
+    path_results = f'{RESULTS_DIR}/{path}.json'
+    json.dump(results, path_results)
 
 
 if __name__ == "__main__":
-    run_experiments()
+    results = run_experiments()
+    print(results)
+    results_to_json(f'{int(time.time())}', results)
