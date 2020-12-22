@@ -22,7 +22,7 @@ Run it with :bash:`docker-compose`. It has the following containers:
 
 To run locally:
 
-1. :bash:`poetry install` or `pip install -r requirements.txt`
+1. :bash:`poetry install` or :bash:`pip install -r requirements.txt`
 2. :bash:`source .venv/bin/activate`
 3. :bash:`python src/run.py`
 
@@ -30,11 +30,11 @@ To run locally:
 the approach
 ------------
 
-Forecast Value of yield token swap at a given future timestep - outputting a score and a timeseries of predicted value
+Forecast Value of yield token swap at a given future timestep.
 
-It is univariate regression: we train an estimator for each timeseries - price, apr. The Value at a given time horizon is the change in value and the compounded interest until that time horizon. The Value is a multiplier of the latest price, eg 1.1 is a 10% increase.
+Output: for each pair, a score and a timeseries of predicted value.
 
-The 1h default resampling interval is to allow the forecasting up to 1 month in 722 steps to be tractable (vs 43444 steps with an interval of 1min).
+It is univariate regression: we train an estimator for each feature timeseries (price, apr), then combine the forecasted curves into a Value by compounding predicted interest on the predicted price.
 
 The estimator used is an ensemble resulting of a quick hyperparameter search.
 
@@ -43,6 +43,8 @@ notes
 -----
 
 status: using historical data provided by Bowhead, not polling the API
+
+The 1h default resampling interval is to allow the forecasting up to 1 month in 722 steps to be tractable (vs 43444 steps with an interval of 1min).
 
 The reason why we don't include a target column in the data is that we fix the base multiplier (1) to be the latest data. In other words, latest data point is used as reference point (1) to calculate the target multiplier.
 
