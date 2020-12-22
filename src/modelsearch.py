@@ -14,6 +14,7 @@ from sktime.forecasting.theta import ThetaForecaster
 
 import dataloader
 import models
+from config import *
 
 #FIXME initial_window= 
 
@@ -66,7 +67,9 @@ def run_experiments() -> dict:
 
 def results_to_json(path: Path, results: dict) -> None:
     path_results = f'{RESULTS_DIR}/{path}.json'
-    json.dump(results, path_results)
+    print(results)
+    with open(path_results, 'w') as f:
+        json.dump(results, f)
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ import pandas as pd
 import forecast.dataloader
 import forecast.forecast_value_univariate as forecast
 
-RESULTS_DIR = 'results'
+from src.config import *
 
 
 def _latest_results_file():
