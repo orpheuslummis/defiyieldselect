@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import forecast.dataloader
-import forecast.forecast_value_univariate as forecast
+import dataloader
+import forecast_value_univariate as forecast
 
-from src.config import *
+from config import *
 
 
 def _latest_results_file():
