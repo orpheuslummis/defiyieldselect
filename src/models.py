@@ -3,9 +3,8 @@ from sklearn.pipeline import Pipeline
 from sktime.base import BaseEstimator
 from sktime.forecasting.compose import (EnsembleForecaster,
                                         ReducedRegressionForecaster)
-from sktime.regression.compose import TimeSeriesForestRegressor
 from sktime.forecasting.theta import ThetaForecaster
-
+from sktime.regression.compose import TimeSeriesForestRegressor
 
 basic_regressor = LinearRegression()
 

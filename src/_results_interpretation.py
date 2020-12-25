@@ -11,7 +11,6 @@ import pandas as pd
 
 import dataloader
 import forecast_value_univariate as forecast
-
 from config import *
 
 

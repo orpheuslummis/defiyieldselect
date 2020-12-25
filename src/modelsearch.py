@@ -1,16 +1,15 @@
 # model search experiments
 
 import itertools
-import numpy as np
-from pathlib import Path
-import time
 import json
+from pathlib import Path
 
+import numpy as np
 from sktime.forecasting.compose import ReducedRegressionForecaster
 from sktime.forecasting.model_selection import (ForecastingGridSearchCV,
                                                 SlidingWindowSplitter)
-from sktime.performance_metrics.forecasting import smape_loss
 from sktime.forecasting.theta import ThetaForecaster
+from sktime.performance_metrics.forecasting import smape_loss
 
 import dataloader
 import models
