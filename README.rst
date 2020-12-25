@@ -44,10 +44,6 @@ notes
 
 status: using historical data provided by Bowhead, not polling the API
 
-The 1h default resampling interval is to allow the forecasting up to 1 month in 722 steps to be tractable (vs 43444 steps with an interval of 1min).
-
-The reason why we don't include a target column in the data is that calculate the compounding starting at the latest data. In other words, we calculate a target interest multiplier starting at the latest data, which is then multiplied with the price, every predicted timestep.
-
 Possible directions of development: 
 
 - compute or improve model (hyperparameter) search
@@ -63,3 +59,11 @@ Possible directions of development:
 - performance
 - data directly from blockchain (API)
 - one big DataFrame
+
+The 1h default resampling interval is to allow the forecasting up to 1 month in 722 steps to be tractable (vs 43444 steps with an interval of 1min).
+
+The reason why we don't include a target column in the data is that calculate the compounding starting at the latest data. In other words, we calculate a target interest multiplier starting at the latest data, which is then multiplied with the price, every predicted timestep.
+
+The generation of compose files is with :bash:`kompose convert`
+
+The generation of the requirements.txt is done with :bash:`poetry export > requirements.txt`
