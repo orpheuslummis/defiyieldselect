@@ -1,0 +1,2 @@
+ssh -t equivos@qbit "docker run --rm -v defiyieldoptimization_results_vol:/results/ -v \$HOME/results/:/tmp/results/ -i -t ubuntu bash -c 'cp -r /results/* /tmp/results/'"
+rsync -av equivos@qbit:results/ results_dl/

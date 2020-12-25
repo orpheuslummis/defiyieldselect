@@ -1,12 +1,12 @@
-version: "3.8"
+version: "3"
 services:
-  # forecast:
-  #   build: .
-  #   command: python src/run.py
-  #   volumes:
-  #     - results_vol:/results/
-  #     - data_vol:/data/
-  #   env_file: env.list
+  forecast:
+    build: .
+    command: python src/run.py
+    volumes:
+      - results_vol:/results/
+      - data_vol:/data/
+    env_file: env.list
   modelsearch:
     build: .
     command: python src/modelsearch.py
@@ -14,10 +14,10 @@ services:
       - results_vol:/results/
       - data_vol:/data/
     env_file: env.list
-  # collect_orcadefi:
-  #   build: .
-  #   command: python datacollect/collect_orcadefi.py
-  #   volumes: [data_vol:/data/]
+  collect_orcadefi:
+    build: .
+    command: python datacollect/collect_orcadefi.py
+    volumes: [data_vol:/data/]
 volumes:
   data_vol:
   results_vol:
