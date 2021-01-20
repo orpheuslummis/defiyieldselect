@@ -1,69 +1,26 @@
-.. role:: bash(code)
-   :language: bash
+DeFi yield optimization
+=======================
 
-README
-======
+Three components:
 
-how to use this
----------------
+- Collecting APR and price data (`collect`)
+- Score each pair of curves (`score`)
+- Expose the scores via a Web JSON API (`serve`)
 
-Run: :bash:`docker-compose up --build`
-
-With the following parameter to input in the :bash:`env.list` file:
-
-- :bash:`TIMESTEP_INTERVAL=1h` resampling interval
-- :bash:`TIMESTEP_HORIZON=722` number of future timesteps to compute
-
-Run it with :bash:`docker-compose`. It has the following containers:
-
-- :bash:`forecasting`: fit and predict future value of swap
-- :bash:`modelsearch`: perform hyperparameter search 
-- :bash:`collect_orcadefi`: every minute, collect orcadefi data API into the data volume
-
-To run locally:
-
-1. :bash:`poetry install` or :bash:`pip install -r requirements.txt`
-2. :bash:`source .venv/bin/activate`
-3. :bash:`python src/run.py`
+Work done for Bowhead by Orfeo Lummis in 2021.
 
 
-the approach
-------------
+How to use
+----------
 
-Forecast Value of yield token swap at a given future timestep.
+Run with docker locally: `./run-local-docker.sh`
 
-Output: for each pair, a score and a timeseries of predicted value.
+Run with kubernetes locally: `./run-local-k8s.sh`
 
-It is univariate regression: we train an estimator for each feature timeseries (price, apr), then combine the forecasted curves into a Value by compounding predicted interest on the predicted price.
+Run locally without Docker (requires Python 3.8 and poetry): `poetry install; source .venv/bin/activate; python -m run`
 
-The estimator used is an ensemble resulting of a quick hyperparameter search.
+Run with kubernetes remotely: `./run-remote-k8s.sh`
 
+In `env.list` define the parameters:
 
-notes
------
-
-status: using historical data provided by Bowhead, not polling the API
-
-Possible directions of development: 
-
-- compute or improve model (hyperparameter) search
-- realtime benchmarking -- smape loss of predicted value (timestep of prediction, horizon) -> loss
-- online learning
-- simulations with stochastic data (eg Quant GAN)
-- putting into production
-- neural nets 
-- reinforcement learning
-- data preprocessing
-- obtaining better data
-- trade execution engine with the various DeFI platforms/dapps
-- performance
-- data directly from blockchain (API)
-- one big DataFrame
-
-The 1h default resampling interval is to allow the forecasting up to 1 month in 722 steps to be tractable (vs 43444 steps with an interval of 1min).
-
-The reason why we don't include a target column in the data is that calculate the compounding starting at the latest data. In other words, we calculate a target interest multiplier starting at the latest data, which is then multiplied with the price, every predicted timestep.
-
-The generation of compose files is with :bash:`kompose convert`
-
-The generation of the requirements.txt is done with :bash:`poetry export > requirements.txt`
+- TBD

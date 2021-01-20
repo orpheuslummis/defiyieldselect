@@ -1,0 +1,5 @@
+.venv
+.git
+data
+kubernetes-manifests
+_data

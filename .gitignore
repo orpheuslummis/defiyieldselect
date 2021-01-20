@@ -6,11 +6,5 @@ __pycache__
 data/*
 !data/bowhead_historical/
 !data/bowhead/
-datacollect/data/*
-docs/_build/
-etc/
-images/
-jupyter/.ipynb_checkpoints/
-results_dl/
-results/
-venv
+_data/
+etc
