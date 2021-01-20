@@ -70,6 +70,7 @@ def fresh_only() -> None:
     in case the app runs forever, to avoid overflow
     """
     while True:
+        time.sleep(PAST_HORIZON)
         stale = datetime.now(timezone.utc) - timedelta(seconds=PAST_HORIZON * 2)
         database = prepared_db()
         with database:
@@ -77,4 +78,3 @@ def fresh_only() -> None:
             n_price = Price.delete().where(Price.datetime < stale).execute()
             n_result = Result.delete().where(Result.datetime < stale).execute()
             print(f'cleared database entries older than {stale}. APR {n_apr}, Price {n_price}, Result {n_result} ')
-        time.sleep(PAST_HORIZON)
