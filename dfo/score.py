@@ -12,8 +12,8 @@ import pandas as pd
 from peewee import fn
 from scipy.stats import linregress
 
-from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, INTERVAL, PAST_HORIZON,
-                        SAMPLING_INTERVAL)
+from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, DEBUG, INTERVAL,
+                        PAST_HORIZON, SAMPLING_INTERVAL)
 from dfo.db import APR, Price, Result, prepared_db
 
 database = prepared_db()

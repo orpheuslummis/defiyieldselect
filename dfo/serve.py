@@ -8,7 +8,7 @@ exposing the results
 from flask import Flask
 
 from dfo.config import PORT
-from dfo.db import Result, prepared_db
+from dfo.db import latest_scores, prepared_db
 
 database = prepared_db()
 app = Flask(__name__)
@@ -27,7 +27,7 @@ app = Flask(__name__)
 
 @app.route('/dfo/results/latest')
 def results_latest() -> dict:
-    return {'results': 'TODO latest'}
+    return {'results': latest_scores()}
 
 
 @app.route('/')

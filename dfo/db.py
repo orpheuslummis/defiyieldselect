@@ -2,7 +2,8 @@
 # using utc datetimes
 
 from peewee import (CharField, Database, DateTimeField, FloatField, Model,
-                    SqliteDatabase)
+                    SqliteDatabase, fn)
+
 from dfo.config import DATA_PATH
 
 database = SqliteDatabase(f'{DATA_PATH}/dfo.db', pragmas={'journal_mode': 'wal'}) 
@@ -45,3 +46,15 @@ def prepared_db() -> Database:
     with database:
         database.create_tables([APR, Price, Result])
         return database
+
+
+def latest_scores() -> dict:
+    with database:
+        latest_time = Result.select(fn.Max(Result.datetime)).scalar()
+        q_results = Result.select().where(Result.datetime == latest_time).order_by(Result.score.desc()).dicts()
+        results = {
+            'datetime': latest_time,
+        }
+        for result in q_results:
+            results[result['token']] = result['score']
+        return results
