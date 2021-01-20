@@ -6,10 +6,9 @@ submit results to db
 
 import datetime
 import time
-from typing import Optional, Set
+from typing import Optional
 
 import pandas as pd
-from peewee import fn
 from scipy.stats import linregress
 
 from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, DEBUG, INTERVAL,
