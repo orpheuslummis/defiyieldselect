@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import pandas as pd
+from peewee import IntegrityError
 from scipy.stats import linregress
 
 from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, DEBUG, INTERVAL,
@@ -98,15 +99,13 @@ def store_result(token: str, score: float, datetime: datetime) -> None:
 
 def run() -> None:
     while True:
+        time.sleep(INTERVAL)
         now = datetime.now(timezone.utc)
         for token_apr in APR_TOKEN_TO_UNISWAPV2_TOKENS:
             data_apr = get_recent_dataframe_token('APR', token_apr)
             data_price = get_recent_dataframe_token('price', token_apr)
-            if data_apr is None or data_price is None:
-                print(f'scoring: skipping {token_apr} because for now we don\'t have recent data')
+            if data_apr is None or data_price is None or len(data_apr) < 1 or len(data_price) < 1:
+                print(f'scoring: skipping {token_apr} because we don\'t have enough recent data')
             else:
-                results = score(token_apr, data_price, data_apr)
-                store_result(token_apr, results, t_start)
-        duration = (datetime.datetime.now() - t_start).total_seconds()
-        if DEBUG: print(f'{duration=}')
-        time.sleep(INTERVAL - duration)
+                token_score = score(token_apr, data_price, data_apr)
+                store_result(token_apr, token_score, now)
