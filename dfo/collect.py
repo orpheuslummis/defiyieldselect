@@ -9,10 +9,11 @@ import requests
 from peewee import IntegrityError
 from web3 import Web3
 
-from dfo.config import (AVG_BLOCK_TIME_HEURISTIC, GRAPH_TOKEN_GROUP_SIZE,
-                        INFURA_ENDPOINT, INTERVAL, ORCA_API_TOKEN,
-                        ORCA_API_URL, REQUEST_TIMEOUT, UNISWAPV2_GRAPH_API_URL,
-                        UNISWAPV2_TOKENIDS, timed_when_debug)
+from dfo.config import (AVG_BLOCK_TIME_HEURISTIC, DEBUG,
+                        GRAPH_TOKEN_GROUP_SIZE, INFURA_ENDPOINT, INTERVAL,
+                        ORCA_API_TOKEN, ORCA_API_URL, REQUEST_TIMEOUT,
+                        UNISWAPV2_GRAPH_API_URL, UNISWAPV2_TOKENIDS,
+                        timed_when_debug)
 from dfo.db import APR, Price, prepared_db
 
 database = prepared_db()
@@ -58,8 +59,8 @@ def get_apr() -> None:
 
 
 def datetimeutc_from_block_heuristic(blocknumber: int) -> datetime.datetime:
-    # TODO Test me. wanting correctness and utcness. for now it's bad
-    print('using heuristic for block time, this is bad')
+    #FIXME this heuristic is not good
+    print('using heuristic for block time')
     approx_seconds_since_genesis =  datetime.timedelta(seconds=(blocknumber * AVG_BLOCK_TIME_HEURISTIC))
     genesis_datetime = datetime.datetime(2015, 7, 30, 15, 26, 28, tzinfo=datetime.timezone.utc)
     return approx_seconds_since_genesis + genesis_datetime
@@ -75,9 +76,6 @@ def datetimeutc_from_block(blocknumber: int) -> Tuple[datetime.datetime, str]:
         return (datetimeutc_from_block_heuristic(blocknumber), 'heuristic')
 
 
-# one price measurement looks like:
-# {"data":{"_meta":{"block":{"number":11628472}},"bundle":{"ethPrice":"1275.37112457166793163706177720231","id":"1"},"tokens":[{"derivedETH":"26.49797471454524981810278279931884","id":"0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e"},{"derivedETH":"30.10764138025488740785364887131035","id":"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"}, [...]
-
 @timed_when_debug
 def graph_query(url: str, query: str) -> Optional[dict]:
     try:
@@ -92,6 +90,9 @@ def graph_query(url: str, query: str) -> Optional[dict]:
     except Exception as e:
         print(f'graph_query ({url}) Exception: {e}')
 
+
+# one price measurement looks like:
+# {"data":{"_meta":{"block":{"number":11628472}},"bundle":{"ethPrice":"1275.37112457166793163706177720231","id":"1"},"tokens":[{"derivedETH":"26.49797471454524981810278279931884","id":"0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e"},{"derivedETH":"30.10764138025488740785364887131035","id":"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"}, [...]
 
 def get_price() -> None:
     """
@@ -135,7 +136,6 @@ def get_price() -> None:
                 value = token_prices[token]
                 tokenid = get_dict_key_from_value(UNISWAPV2_TOKENIDS, token)
                 try:
-                    # print(f'{datetimeutc=} {tokenid=} {value=} {timesource=}')
                     Price.create(datetime=datetimeutc, token=tokenid, value=value, source=timesource)
                 except IntegrityError as e:
                     print(f'poll_price: ({datetimeutc=} {tokenid=} {value=} {timesource=}) - {e}')

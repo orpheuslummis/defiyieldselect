@@ -5,7 +5,7 @@ from peewee import (CharField, Database, DateTimeField, FloatField, Model,
                     SqliteDatabase)
 from dfo.config import DATA_PATH
 
-database = SqliteDatabase(f'{DATA_PATH}/dfo.db', pragmas={'journal_mode': 'wal'}) # FIXME 
+database = SqliteDatabase(f'{DATA_PATH}/dfo.db', pragmas={'journal_mode': 'wal'}) 
 
 
 class BaseModel(Model):

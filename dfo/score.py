@@ -41,7 +41,6 @@ def get_recent_dataframe_token(modelname: str, token_apr: str) -> Optional[pd.Da
     ).dicts())) # TODO more efficient way than -> dict -> list -> dataframe
     if len(data) == 0:
         return None
-    # print(f'{modelname} {token} {data=}')
     data = data.drop(columns=['id'])
     # resampling
     data['datetime'] = pd.to_datetime(data['datetime'])
@@ -51,10 +50,6 @@ def get_recent_dataframe_token(modelname: str, token_apr: str) -> Optional[pd.Da
     data = data.reset_index()
     data['datetime'] = pd.to_numeric(data['datetime'])
     return data
-
-
-def get_apr_tokens() -> Set[str]:
-    return set(pd.DataFrame(list(APR.select().dicts()))['token'])
 
 
 def linreg(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame):
@@ -72,7 +67,6 @@ def linreg(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame):
 
     reg_apr = linregress(data_apr['datetime'], data_apr['value'])
     reg_price = linregress(data_price['datetime'], data_price['value'])
-    
     return reg_apr, reg_price
 
 
@@ -90,7 +84,7 @@ def score(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> f
     """
     reg_apr, reg_price = linreg(token_apr, data_price, data_apr)
     score = reg_price.slope * reg_apr.slope
-    print(f'{token_apr} {reg_price.slope} * {reg_apr.slope=} = {score=}')
+    if DEBUG: print(f'{token_apr} {reg_price.slope} * {reg_apr.slope=} = {score=}')
     return score
 
 
@@ -99,18 +93,10 @@ def store_result(token: str, score: float, now=datetime.datetime) -> None:
         Result.create(datetime=now, token=token, score=score)
 
 
-def display_scores() -> None:
-    with database:
-        latest_time = Result.select(fn.Max(Result.datetime)).scalar()
-        q = Result.select().where(Result.datetime == latest_time).order_by(Result.score.desc()).dicts()
-        if len(q) > 0:
-            [print(f"{r['token']} score: {r['score']}") for r in q]
-
-
 def run() -> None:
     while True:
         t_start = datetime.datetime.now()
-        for token_apr in get_apr_tokens():
+        for token_apr in APR_TOKEN_TO_UNISWAPV2_TOKENS:
             data_apr = get_recent_dataframe_token('APR', token_apr)
             data_price = get_recent_dataframe_token('price', token_apr)
             if data_apr is None or data_price is None:
@@ -118,7 +104,6 @@ def run() -> None:
             else:
                 results = score(token_apr, data_price, data_apr)
                 store_result(token_apr, results, t_start)
-        display_scores()
         duration = (datetime.datetime.now() - t_start).total_seconds()
-        print(f'{duration=}')
+        if DEBUG: print(f'{duration=}')
         time.sleep(INTERVAL - duration)

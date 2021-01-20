@@ -25,12 +25,6 @@ app = Flask(__name__)
 #         database.close()
 
 
-@app.route('/dfo/results/all')
-def results_all() -> dict:
-    results = Result.select()
-    return {'results': results}
-
-
 @app.route('/dfo/results/latest')
 def results_latest() -> dict:
     return {'results': 'TODO latest'}
