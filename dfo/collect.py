@@ -9,11 +9,10 @@ import requests
 from peewee import IntegrityError
 from web3 import Web3
 
-from dfo.config import (AVG_BLOCK_TIME_HEURISTIC,
-                        GRAPH_TOKEN_GROUP_SIZE, INFURA_ENDPOINT, INTERVAL,
-                        ORCA_API_TOKEN, ORCA_API_URL, REQUEST_TIMEOUT,
-                        UNISWAPV2_GRAPH_API_URL, UNISWAPV2_TOKENIDS,
-                        timed_when_debug)
+from dfo.config import (AVG_BLOCK_TIME_HEURISTIC, GRAPH_TOKEN_GROUP_SIZE,
+                        INFURA_ENDPOINT, INTERVAL, ORCA_API_TOKEN,
+                        ORCA_API_URL, REQUEST_TIMEOUT, UNISWAPV2_GRAPH_API_URL,
+                        UNISWAPV2_TOKENIDS, timed_when_debug)
 from dfo.db import APR, Price, prepared_db
 
 database = prepared_db()
