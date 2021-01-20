@@ -33,7 +33,7 @@ def get_recent_dataframe_token(modelname: str, token_apr: str) -> Optional[pd.Da
         token = APR_TOKEN_TO_UNISWAPV2_TOKENS[token_apr]
     else:
         raise Exception
-    past_time_lower_bound = datetime.datetime.utcnow() - datetime.timedelta(seconds=PAST_HORIZON)
+    past_time_lower_bound = datetime.now(timezone.utc) - timedelta(seconds=PAST_HORIZON)
     data = pd.DataFrame(list(model.select().where(
         model.datetime >= past_time_lower_bound,
         model.token == token
