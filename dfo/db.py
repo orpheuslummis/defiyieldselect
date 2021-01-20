@@ -40,6 +40,10 @@ class Result(BaseModel):
     datetime = DateTimeField()
     token = CharField()
     score = FloatField()
+    class Meta:
+        indexes = (
+            (('token', 'datetime'), True),
+        )
 
 
 def prepared_db() -> Database:
