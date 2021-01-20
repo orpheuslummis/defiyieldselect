@@ -1,7 +1,7 @@
 import concurrent.futures as cf
-import datetime
 import math
 import time
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Tuple
 
 import dateutil.parser
@@ -58,20 +58,20 @@ def get_apr() -> None:
         print(f'poll_apr: connection error')
 
 
-def datetimeutc_from_block_heuristic(blocknumber: int) -> datetime.datetime:
+def datetimeutc_from_block_heuristic(blocknumber: int) -> datetime:
     #FIXME this heuristic is not good
     print('using heuristic for block time')
-    approx_seconds_since_genesis =  datetime.timedelta(seconds=(blocknumber * AVG_BLOCK_TIME_HEURISTIC))
-    genesis_datetime = datetime.datetime(2015, 7, 30, 15, 26, 28, tzinfo=datetime.timezone.utc)
+    approx_seconds_since_genesis =  timedelta(seconds=(blocknumber * AVG_BLOCK_TIME_HEURISTIC))
+    genesis_datetime = datetime(2015, 7, 30, 15, 26, 28, tzinfo=timezone.utc)
     return approx_seconds_since_genesis + genesis_datetime
 
 
-def datetimeutc_from_block(blocknumber: int) -> Tuple[datetime.datetime, str]:
+def datetimeutc_from_block(blocknumber: int) -> Tuple[datetime, str]:
     # if web3 request fails, use heuristic
     try:
         w3 = Web3(Web3.HTTPProvider(INFURA_ENDPOINT))
         block = w3.eth.getBlock('latest')
-        return (datetime.datetime.fromtimestamp(block.timestamp, tz=datetime.timezone.utc), 'web3')
+        return (datetime.fromtimestamp(block.timestamp, tz=timezone.utc), 'web3')
     except requests.Timeout:
         return (datetimeutc_from_block_heuristic(blocknumber), 'heuristic')
 
@@ -158,5 +158,5 @@ def run() -> None:
             fs = [pool.submit(f) for f in datagetters]
             [f.result() for f in cf.as_completed(fs)]
             duration = time.time() - t_start
-            print(f'{datetime.datetime.now()}: collection round done in {duration:.2f} seconds')
+            print(f'{datetime.now(timezone.utc)}: collection round done in {duration:.2f} seconds')
             time.sleep(INTERVAL - duration)

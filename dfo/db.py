@@ -1,6 +1,6 @@
 import time
+from datetime import datetime, timedelta, timezone
 
-import datetime
 from peewee import (CharField, Database, DateTimeField, FloatField, Model,
                     SqliteDatabase, fn)
 
@@ -66,7 +66,7 @@ def fresh_only() -> None:
     in case the app runs forever, to avoid overflow
     """
     while True:
-        stale = datetime.datetime.utcnow() - datetime.timedelta(seconds=PAST_HORIZON * 2)
+        stale = datetime.now(timezone.utc) - timedelta(seconds=PAST_HORIZON * 2)
         database = prepared_db()
         with database:
             n_apr = APR.delete().where(APR.datetime < stale).execute()

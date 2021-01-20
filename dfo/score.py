@@ -4,8 +4,8 @@ score: combine APR and price slope
 submit results to db
 """
 
-import datetime
 import time
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import pandas as pd
@@ -87,14 +87,15 @@ def score(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> f
     return score
 
 
-def store_result(token: str, score: float, now=datetime.datetime) -> None:
+def store_result(token: str, score: float, datetime: datetime) -> None:
     with database:
-        Result.create(datetime=now, token=token, score=score)
+        print(f'{token=}, {score=}, {datetime=}')
+        Result.create(datetime=datetime, token=token, score=score)
 
 
 def run() -> None:
     while True:
-        t_start = datetime.datetime.now()
+        now = datetime.now(timezone.utc)
         for token_apr in APR_TOKEN_TO_UNISWAPV2_TOKENS:
             data_apr = get_recent_dataframe_token('APR', token_apr)
             data_price = get_recent_dataframe_token('price', token_apr)
