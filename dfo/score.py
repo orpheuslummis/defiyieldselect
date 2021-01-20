@@ -90,7 +90,10 @@ def score(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> f
 def store_result(token: str, score: float, datetime: datetime) -> None:
     with database:
         print(f'{token=}, {score=}, {datetime=}')
-        Result.create(datetime=datetime, token=token, score=score)
+        try:
+            Result.create(datetime=datetime, token=token, score=score)
+        except IntegrityError as e:
+            print(f'store_result: ({datetime=} {token=} {score=}) - {e}')
 
 
 def run() -> None:
