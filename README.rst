@@ -27,3 +27,5 @@ Run remotely with kubernetes: :bash:`./run-remote-k8s.sh`
 In :bash:`env.list` define the parameters:
 
 - TBD
+
+Perform a HTTP GET query on the endpoint :bash:`/dfo/results/latest` to obtain latest results.

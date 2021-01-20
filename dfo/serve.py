@@ -6,8 +6,9 @@ exposing the results
 """
 
 from flask import Flask
+from gevent.pywsgi import WSGIServer
 
-from dfo.config import HOST, PORT
+from dfo.config import DEBUG, HOST, PORT
 from dfo.db import latest_scores, prepared_db
 
 database = prepared_db()
@@ -36,4 +37,8 @@ def healthcheck() -> str:
 
 
 def run() -> None:
-    app.run(port=PORT, host=HOST)
+    if not DEBUG:
+        http_server = WSGIServer((HOST, PORT), app)
+        http_server.serve_forever()
+    else:
+        app.run(port=PORT, host=HOST)
