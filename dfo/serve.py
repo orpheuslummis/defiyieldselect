@@ -9,26 +9,15 @@ from flask import Flask
 from gevent.pywsgi import WSGIServer
 
 from dfo.config import DEBUG, HOST, PORT
-from dfo.db import latest_scores, prepared_db
+from dfo.db import latest_results
 
-database = prepared_db()
 app = Flask(__name__)
-
-
-# @app.before_request
-# def _db_connect():
-#     database.connect()
-
-
-# @app.teardown_request
-# def _db_close(exc):
-#     if not database.is_closed():
-#         database.close()
+app.config['JSON_SORT_KEYS'] = False
 
 
 @app.route('/dfo/results/latest')
 def results_latest() -> dict:
-    return {'results': latest_scores()}
+    return {'results': latest_results()}
 
 
 @app.route('/')
