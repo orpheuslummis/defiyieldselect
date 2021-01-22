@@ -12,8 +12,9 @@ import pandas as pd
 from peewee import IntegrityError
 from scipy.stats import linregress
 
-from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, DEBUG, INTERVAL,
-                        PAST_HORIZON, SAMPLING_INTERVAL)
+from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, APR_TOKENS, DEBUG,
+                        INTERVAL, ORCA_API_MANTISSA, PAST_HORIZON,
+                        PRICE_WEIGHT, SAMPLING_INTERVAL)
 from dfo.db import APR, Price, Result, prepared_db
 
 database = prepared_db()
@@ -34,78 +35,82 @@ def get_recent_dataframe_token(modelname: str, token_apr: str) -> Optional[pd.Da
         token = APR_TOKEN_TO_UNISWAPV2_TOKENS[token_apr]
     else:
         raise Exception
+    # obtain from db
     past_time_lower_bound = datetime.now(timezone.utc) - timedelta(seconds=PAST_HORIZON)
     data = pd.DataFrame(list(model.select().where(
         model.datetime >= past_time_lower_bound,
         model.token == token
-    ).dicts())) # TODO more efficient way than -> dict -> list -> dataframe
+    ).dicts())) # there probably is a more efficient way than -> dict -> list -> dataframe
     if len(data) == 0:
         return None
     data = data.drop(columns=['id'])
     # resampling
-    data['datetime'] = pd.to_datetime(data['datetime'])
+    data.datetime = pd.to_datetime(data.datetime)
     data = data.set_index('datetime')
     data  = data.resample(SAMPLING_INTERVAL).mean().bfill()
-    # we use nanosecond timestamp
+    # obtaining time relative to beginning of frame for regression
     data = data.reset_index()
-    data['datetime'] = pd.to_numeric(data['datetime'])
+    data.datetime = pd.to_numeric(data.datetime)
+    data['seconds_since'] = (data.datetime - data.datetime[0])/int(1e9)
     return data
 
 
-def linreg(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame):
+def dataframe_common_length(dfa: pd.DataFrame, dfb: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
+    min_length = min(dfa.shape[0], dfb.shape[0])
+    dfa = dfa[-min_length:]
+    dfb = dfb[-min_length:]
+    assert dfa.shape == dfb.shape
+    return (dfa, dfb)
+
+
+def model_a(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> float:
     """
-    input:
-    output:
+    approach: multiply APR by a weighted slope of linear regression of price
     """
-    token_price = APR_TOKEN_TO_UNISWAPV2_TOKENS[token_apr]
-    
-    # take the 'common denominator' of data length, to have the same size of most recent data
-    min_length = min(data_apr.shape[0], data_price.shape[0])
-    data_apr = data_apr[-min_length:]
-    data_price = data_price[-min_length:]
-    assert data_apr.shape == data_price.shape
-
-    reg_apr = linregress(data_apr['datetime'], data_apr['value'])
-    reg_price = linregress(data_price['datetime'], data_price['value'])
-    return reg_apr, reg_price
-
-
-def score(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> float:
-    """
-    we score every token_apr
-
-    scoring: 
-
-    linear regression of apr
-    linear regression of price
-    combine them to create a score
-
-    interval_start, interval_end, regression_apr, regression_price, stddev, modelid
-    """
-    reg_apr, reg_price = linreg(token_apr, data_price, data_apr)
-    score = reg_price.slope * reg_apr.slope
-    if DEBUG: print(f'{token_apr} {reg_price.slope} * {reg_apr.slope=} = {score=}')
+    data_price, data_apr = dataframe_common_length(data_price, data_apr)
+    reg_price = linregress(data_price.seconds_since, data_price.value)
+    price_factor = (1 + reg_price.slope * PRICE_WEIGHT)
+    apr_mean = data_apr['value'].div(ORCA_API_MANTISSA).mean()
+    score = price_factor * apr_mean
+    if DEBUG: print(f"model_a: {token_apr} {price_factor=} * {apr_mean=} = {score=}")
     return score
 
 
-def store_result(token: str, score: float, datetime: datetime) -> None:
+def model_b(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> float:
+    """
+    approach: multiply APR by the cubed slope of linear regression of price
+    """
+    data_price, data_apr = dataframe_common_length(data_price, data_apr)
+    reg_price = linregress(data_price.seconds_since, data_price.value)
+    price_factor = (1 + reg_price.slope)**3
+    apr_mean = data_apr['value'].div(ORCA_API_MANTISSA).mean()
+    score = price_factor * apr_mean
+    if DEBUG: print(f"model_b: {token_apr} {price_factor=} * {apr_mean=} = {score=}")
+    return score
+
+
+def store_result(datetime: datetime, token: str, modelid: str, score: float) -> None:
     with database:
-        print(f'{token=}, {score=}, {datetime=}')
         try:
-            Result.create(datetime=datetime, token=token, score=score)
+            Result.create(datetime=datetime, token=token, modelid=modelid, score=score)
         except IntegrityError as e:
-            print(f'store_result: ({datetime=} {token=} {score=}) - {e}')
+            print(f'store_result: ({datetime=} {token=} {modelid=} {score=}) - {e}')
 
 
 def run() -> None:
+    models = [
+        model_a,
+        model_b
+    ]
     while True:
         time.sleep(INTERVAL)
         now = datetime.now(timezone.utc)
-        for token_apr in APR_TOKEN_TO_UNISWAPV2_TOKENS:
+        for token_apr in APR_TOKENS:
             data_apr = get_recent_dataframe_token('APR', token_apr)
             data_price = get_recent_dataframe_token('price', token_apr)
-            if data_apr is None or data_price is None or len(data_apr) < 1 or len(data_price) < 1:
+            if data_apr is None or data_price is None or len(data_apr) < 2 or len(data_price) < 2:
                 print(f'scoring: skipping {token_apr} because we don\'t have enough recent data')
             else:
-                token_score = score(token_apr, data_price, data_apr)
-                store_result(token_apr, token_score, now)
+                for model in models:
+                    token_score = model(token_apr, data_price, data_apr)
+                    store_result(datetime=now, token=token_apr, modelid=model.__name__, score=token_score)

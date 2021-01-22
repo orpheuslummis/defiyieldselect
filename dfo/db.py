@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from peewee import (CharField, Database, DateTimeField, FloatField, Model,
                     SqliteDatabase, fn)
 
-from dfo.config import DATA_PATH, PAST_HORIZON
+from dfo.config import DATA_PATH, MODEL_MAIN, PAST_HORIZON
 
 database = SqliteDatabase(f'{DATA_PATH}/dfo.db', pragmas={'journal_mode': 'wal'}) 
 
@@ -39,10 +39,11 @@ class Price(BaseModel):
 class Result(BaseModel):
     datetime = DateTimeField()
     token = CharField()
+    modelid = CharField()
     score = FloatField()
     class Meta:
         indexes = (
-            (('token', 'datetime'), True),
+            (('token', 'datetime', 'modelid'), True),
         )
 
 
@@ -52,15 +53,23 @@ def prepared_db() -> Database:
         return database
 
 
-def latest_scores() -> dict:
+def latest_results() -> dict:
+    """return latest group of results ordered by score"""
     with database:
         latest_time = Result.select(fn.Max(Result.datetime)).scalar()
-        q_results = Result.select().where(Result.datetime == latest_time).order_by(Result.score.desc()).dicts()
+        if latest_time == None:
+            return {"error": "results are not yet ready"}
+        q_results = Result.select().where(
+            Result.datetime == latest_time,
+            Result.modelid == MODEL_MAIN
+        ).order_by(Result.score.desc()).dicts()
         results = {
-            'datetime': latest_time,
-        }
+            'scores': {},
+            'last_update': latest_time,
+            }
         for result in q_results:
-            results[result['token']] = result['score']
+            results['scores'][result['token']] = result['score']
+        # TODO meta information such as modelid, model parameters, ...
         return results
 
 
