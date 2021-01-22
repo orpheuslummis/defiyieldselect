@@ -1,7 +1,6 @@
 # assuming a local kubernetes context is active
 echo "~~~ running once more! ~~~"
-kubectl create configmap bowhead-dfo-config --from-file=
-kubectl delete --grace-period=1 -f kubernetes-manifests/ 
+kubectl delete --grace-period=1 -f bowhead-dfo.yaml
 docker build -t gcr.io/equivos-main/bowhead-dfo .
 kubectl apply -f bowhead-dfo.yaml
 kubectl rollout status deployment bowhead-dfo-deployment

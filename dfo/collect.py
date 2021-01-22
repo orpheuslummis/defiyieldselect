@@ -2,6 +2,7 @@ import concurrent.futures as cf
 import math
 import time
 from datetime import datetime, timedelta, timezone
+from functools import wraps
 from typing import Optional, Tuple
 
 import dateutil.parser
@@ -16,6 +17,19 @@ from dfo.config import (AVG_BLOCK_TIME_HEURISTIC, GRAPH_TOKEN_GROUP_SIZE,
 from dfo.db import APR, Price, prepared_db
 
 database = prepared_db()
+
+
+def timed_when_debug(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if DEBUG:
+            t_start = time.time()
+            result = f(*args, **kwargs)
+            print(f'DEBUG: {time.time() - t_start:.2f} seconds elapsed for {f.__name__}({args} {kwargs})')
+            return result
+        else:
+            return f(*args, **kwargs)
+    return wrapped
 
 
 def get_dict_key_from_value(d: dict, v: float) -> str:

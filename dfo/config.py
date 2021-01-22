@@ -1,59 +1,33 @@
 import os
-import signal
-import sys
-import time
-from functools import wraps
 
 from web3.main import Web3
 
+# interval for scoring and for  data collection
+INTERVAL = 60.0 # seconds
+REQUEST_TIMEOUT = 20.0 # seconds, graphql takes a while!
+SAMPLING_INTERVAL = '1min'
+assert INTERVAL >= REQUEST_TIMEOUT * 2 # to ensure the thread pool behaves well
 
-def exit_gracefully(signumber, _):
-  print("Received signal", signumber, "cleaning up...")
-  sys.exit(0)
-
-signal.signal(signal.SIGTERM, exit_gracefully)
-
-
-def timed_when_debug(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        if DEBUG:
-            t_start = time.time()
-            result = f(*args, **kwargs)
-            print(f'DEBUG: {time.time() - t_start:.2f} seconds elapsed for {f.__name__}({args} {kwargs})')
-            return result
-        else:
-            return f(*args, **kwargs)
-    return wrapped
-
+PAST_HORIZON = 600.0
 
 ORCA_API_URL = 'http://orcadefi.com:10000/api/v1/realtime/'
 ORCA_API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
-
-UNISWAPV2_GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
-GRAPH_TOKEN_GROUP_SIZE = 8  # query in smaller group to avoid processing errors
+ORCA_API_MANTISSA = 1e18
 
 # Orfeo holds this endpoint, not garanteed to work beyond the first months of 2020
 INFURA_ENDPOINT = 'https://mainnet.infura.io/v3/eb577b703a3e4db89f756b660db47f6c'
 
+UNISWAPV2_GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
+GRAPH_TOKEN_GROUP_SIZE = 8  # query in smaller group to avoid processing errors
+
 PORT = 8000  # has to mirror the deployment config
 HOST = '0.0.0.0'
 
-# TODO: explain behavior and possibility of getting closer to 5 seconds
-# interval for the scoring and for the data collection
-INTERVAL = 60.0 # seconds
-REQUEST_TIMEOUT = 20.0 # seconds, graphql takes a while!
-assert INTERVAL >= REQUEST_TIMEOUT * 2 # to ensure the thread pool behaves well
+PRICE_WEIGHT = 2.0
 
-SAMPLING_INTERVAL = '1min' # used to normalize the sampling rate
+MODEL_MAIN = 'model_a'
 
-PAST_HORIZON = 600.0 # seconds
 
-# TIMESTEP_PERIOD = '1h'
-# TIMESTEP_HORIZON = 722
-# PLOTS=False
-
-# TODO some are 'inactive' on Uniswapv2
 UNISWAPV2_TOKENIDS = {
     'BAT': '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
     'BUSD': '0x4Fabb145d64652a948d72533023f6E7A623C7C53',
@@ -132,8 +106,8 @@ APR_TOKEN_TO_UNISWAPV2_TOKENS = {
     'DETH': 'WETH',
     'DSAI': 'SAI'
 }
-
 assert set(APR_TOKEN_TO_UNISWAPV2_TOKENS.values()) ==  set(UNISWAPV2_TOKENIDS.keys())
+APR_TOKENS = APR_TOKEN_TO_UNISWAPV2_TOKENS.keys() # a shorthand
 
 
 # heuristic for when Infura is not available:
@@ -151,7 +125,9 @@ if os.getenv('DEBUG') == 'True':
     DEBUG = True
     DATA_PATH = 'data'
     os.makedirs(DATA_PATH, exist_ok=True)
-    PAST_HORIZON = 60000.0
+    # PAST_HORIZON = 6000.0
 else:
     DEBUG = False
-    DATA_PATH = '/data'
+    # DATA_PATH = '/data'
+    # DATA_PATH = '/tmp/'
+    DATA_PATH = 'data'
