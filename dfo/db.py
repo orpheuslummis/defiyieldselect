@@ -86,4 +86,4 @@ def fresh_only() -> None:
             n_apr = APR.delete().where(APR.datetime < stale).execute()
             n_price = Price.delete().where(Price.datetime < stale).execute()
             n_result = Result.delete().where(Result.datetime < stale).execute()
-            print(f'cleared database entries older than {stale}. APR {n_apr}, Price {n_price}, Result {n_result} ')
+            print(f'cleared database entries older than {stale}. APR {n_apr}, Price {n_price}, Result {n_result} cleared')
