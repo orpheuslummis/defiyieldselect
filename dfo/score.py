@@ -1,9 +1,3 @@
-"""
-take recent data
-score: combine APR and price slope
-submit results to db
-"""
-
 import time
 from datetime import datetime, timedelta, timezone
 from typing import Optional

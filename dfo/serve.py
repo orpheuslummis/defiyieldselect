@@ -1,10 +1,3 @@
-"""
-exposing the results
-
-/latest
-/TBD (obtain specific intervals)
-"""
-
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 
