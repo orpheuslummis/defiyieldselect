@@ -60,6 +60,13 @@ Multiplication of the mean of APR values and the weighted slope of a linear regr
 
 Multiplication of the mean of APR values and a cubed slope of a linear regression of price values.
 
+### Architecture
+
+Thread per component:
+- `collect`: thread pool to periodically run the *datagetters* each in a thread
+- `score`: periodically computing scores from data
+- `serve`: exposing the results with a Flask app
+
 
 ## Varia
 
