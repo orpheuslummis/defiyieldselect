@@ -35,4 +35,4 @@ spec:
   ports:
   - port: 8000
     targetPort: 8000
-# this needs to be configured with an Ingress, which is defined in another repo
+# to be access externally, this needs to be configured with an Ingress
