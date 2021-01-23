@@ -8,7 +8,8 @@ REQUEST_TIMEOUT = 20.0 # seconds, graphql takes a while!
 SAMPLING_INTERVAL = '1min'
 assert INTERVAL >= REQUEST_TIMEOUT * 2 # to ensure the thread pool behaves well
 
-PAST_HORIZON = 600.0
+PAST_HORIZON = 1200.0 # seconds
+# PAST_HORIZON / SAMPLING_INTERVAL is the number of past data points considered
 
 ORCA_API_URL = 'http://orcadefi.com:10000/api/v1/realtime/'
 ORCA_API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
@@ -124,10 +125,9 @@ AVG_BLOCK_TIME_HEURISTIC = 13.0 # seconds
 if os.getenv('DEBUG') == 'True':
     DEBUG = True
     DATA_PATH = 'data'
-    os.makedirs(DATA_PATH, exist_ok=True)
     # PAST_HORIZON = 6000.0
 else:
     DEBUG = False
     # DATA_PATH = '/data'
-    # DATA_PATH = '/tmp/'
     DATA_PATH = 'data'
+os.makedirs(DATA_PATH, exist_ok=True)
