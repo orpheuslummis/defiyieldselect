@@ -6,10 +6,10 @@ Three components:
 - Score each pair of curves (`score`)
 - Expose the scores via a Web JSON API (`serve`)
 
-Work done for Bowhead by Orfeo Lummis in 2021.
+Work done for Bowhead by Orpheus Lummis in January 2021.
 
 
-## How to use
+## How to run
 
 Run locally with docker: `./run-local-docker.sh`
 
@@ -21,11 +21,50 @@ Run remotely with kubernetes: `./run-remote-k8s.sh`
 
 Define your prefered parameters of the app in `dfo/config.py`, or leave it at the defaults.
 
-Perform a HTTP GET query on the endpoint `/dfo/results/latest` to obtain latest results.
+
+## API
+
+HTTP GET endpoints for latest results:
+
+- `/dfo/results/latest` for main model
+- `/dfo/results/model/<model_name>/latest` for latest results of a particular model
 
 
-## Notes
+## Implementation
 
-Price information is obtained using web3 (Infura) and graphql (thegraph.com's `uniswapv2` subgraph). Because these sources support at most a polling frequency of 30-60 seconds. By using a custom price API the polling frequency could be increased.
+### Data collection
 
-The `_start` field of the APR field is not used as we assume 
+APR data obtained by polling the OrcaDeFi APR API.
+
+Price data obtained by polling the UniswapV2 subgraph on thegraph.com.
+
+Ethereum block timestamps are obtained by web3 with Infura as node.
+
+
+### Data normalization
+
+Scoring is done using a "scoring frame", that is both APR and Price dataframes over a past horizon.
+
+We make it so that:
+
+- the dataframe lengths are the same
+- the price values are relative to their mean for comparability between tokens
+- APR is a percentage
+- the scoring frame has a integer representation of time relative to its beginning
+
+### Model A (`model_a`)
+
+Multiplication of the mean of APR values and the weighted slope of a linear regression of price values.
+
+### Model B (`model_b`)
+
+Multiplication of the mean of APR values and a cubed slope of a linear regression of price values.
+
+
+## Varia
+
+The rice data source (thegraph.com) supports at most a polling frequency of 30-60 seconds. By using a custom price API the polling frequency could be increased.
+
+The `_start` field of the APR field is not used as we assume the `_stop` field is the given time of APR measurement.
+
+As of Enero 2021 it is deployed at https://equivos.dev/defiyieldoptimization/results/latest but we don't garantee uptime beyond Febrero 2021
