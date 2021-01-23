@@ -1,12 +1,12 @@
 # DeFi yield optimization
 
-Three components:
+Work done for Bowhead by Orpheus Lummis in January 2021.
+
+Three main components:
 
 - Collecting APR and price data (`collect`)
 - Score each pair of curves (`score`)
 - Expose the scores via a Web JSON API (`serve`)
-
-Work done for Bowhead by Orpheus Lummis in January 2021.
 
 
 ## How to run
@@ -63,8 +63,8 @@ Multiplication of the mean of APR values and a cubed slope of a linear regressio
 
 ## Varia
 
-The rice data source (thegraph.com) supports at most a polling frequency of 30-60 seconds. By using a custom price API the polling frequency could be increased.
+The price data source (thegraph.com) supports at most a polling frequency of 30-60 seconds. By using a custom price API the polling frequency could be increased.
 
 The `_start` field of the APR field is not used as we assume the `_stop` field is the given time of APR measurement.
 
-As of Enero 2021 it is deployed at https://equivos.dev/defiyieldoptimization/results/latest but we don't garantee uptime beyond Febrero 2021
+As of Enero 2021 it is deployed at [https://equivos.dev/defiyieldoptimization/](https://equivos.dev/defiyieldoptimization/) but we don't garantee uptime beyond Febrero 2021
