@@ -52,13 +52,6 @@ We make it so that:
 - APR is a percentage
 - the scoring frame has a integer representation of time relative to its beginning
 
-### Model A (`model_a`)
-
-Multiplication of the mean of APR values and the weighted slope of a linear regression of price values.
-
-### Model B (`model_b`)
-
-Multiplication of the mean of APR values and a cubed slope of a linear regression of price values.
 
 ### Architecture
 
@@ -66,6 +59,16 @@ Thread per component:
 - `collect`: thread pool to periodically run the *datagetters* each in a thread
 - `score`: periodically computing scores from data
 - `serve`: exposing the results with a Flask app
+
+### Model A (`model_a`)
+
+Multiplication of the mean of APR values and the weighted slope of a linear regression of price values.
+
+This is our main model.
+
+### Model B (`model_b`)
+
+Multiplication of the mean of APR values and a cubed slope of a linear regression of price values.
 
 
 ## Varia
