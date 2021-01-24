@@ -32,6 +32,11 @@ HTTP GET endpoints for latest results:
 
 ## Implementation
 
+Using contemporary Python with typing, scipy for linear regression, Flask for the web API, peewee as ORM, pandas for statistical and table/matrix operations, ...
+
+All of it is specific to the price and APR data.
+
+
 ### Data collection
 
 APR data obtained by polling the OrcaDeFi APR API.
@@ -70,11 +75,19 @@ This is our main model.
 
 Multiplication of the mean of APR values and a cubed slope of a linear regression of price values.
 
+### Model C (`model_c`)
+
+Random number baseline.
+
 
 ## Varia
 
 The price data source (thegraph.com) supports at most a polling frequency of 30-60 seconds. By using a custom price API the polling frequency could be increased.
 
+5-10% of the token price queries to thegraph.com fail, even when we purposefuly do simpler (but more) queries. The impact of this is tolerable because of the regularity of the data and the timespan of minutes we're operating on.
+
 The `_start` field of the APR field is not used as we assume the `_stop` field is the given time of APR measurement.
 
-As of Enero 2021 it is deployed at [https://equivos.dev/defiyieldoptimization/](https://equivos.dev/defiyieldoptimization/) but we don't garantee uptime beyond Febrero 2021
+This app is deployed at [https://equivos.dev/defiyieldoptimization/](https://equivos.dev/defiyieldoptimization/) for the duration of January and February 2021.
+
+Correctness is a goal here, but for the sake of time only piecemeal testing was done for tricky bits, in a different repository.
