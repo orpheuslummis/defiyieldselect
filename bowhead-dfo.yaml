@@ -16,10 +16,10 @@ spec:
         image: gcr.io/equivos-main/bowhead-dfo:latest
         resources:
           requests:
-            memory: "32Mi"
+            memory: "128Mi"
             cpu: "100m"
           limits:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "500m"
         ports:
         - containerPort: 8000
