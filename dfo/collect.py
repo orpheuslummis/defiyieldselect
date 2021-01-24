@@ -25,7 +25,7 @@ def timed_when_debug(f):
         if DEBUG:
             t_start = time.time()
             result = f(*args, **kwargs)
-            print(f'DEBUG: {time.time() - t_start:.2f} seconds elapsed for {f.__name__}({args} {kwargs})')
+            print(f'DEBUG: {time.time() - t_start:.2f} seconds elapsed for {f.__name__}')
             return result
         else:
             return f(*args, **kwargs)
@@ -69,6 +69,8 @@ def get_apr() -> None:
         print(f'poll_apr: timeout')
     except requests.exceptions.ConnectionError:
         print(f'poll_apr: connection error')
+    except TypeError as e:
+        print(f'APR API is not behaving as expected: {e}')
 
 
 def datetimeutc_from_block_heuristic(blocknumber: int) -> datetime:
@@ -91,6 +93,7 @@ def datetimeutc_from_block(blocknumber: int) -> Tuple[datetime, str]:
 
 @timed_when_debug
 def graph_query(url: str, query: str) -> Optional[dict]:
+    time.sleep(2) # be gentle on thegraph.com
     try:
         response = requests.post(url, timeout=REQUEST_TIMEOUT, json={'query': query})
         try:
@@ -124,6 +127,8 @@ def get_price() -> None:
             return None
         ethprice = float(data_meta['bundle']['ethPrice'])
         blocknumber = data_meta['_meta']['block']['number']
+        # because thegraph.com's has short delays, we operate on the previous block
+        blocknumber = blocknumber - 1
         datetimeutc, timesource = datetimeutc_from_block(blocknumber)
 
         # obtain prices in a few queries
@@ -136,7 +141,7 @@ def get_price() -> None:
         token_prices = {}
         for group in lists_tokenids:
             list_tokenids_str = ','.join([f'"{tokenid}"' for tokenid in group])
-            query = '{ tokens (where: {id_in: [ %s ]}) { id derivedETH } }' % list_tokenids_str
+            query = '{ tokens (block: {number:%s}, where: {id_in: [ %s ]}) { id derivedETH } }' % (blocknumber, list_tokenids_str)
             token_data = graph_query(UNISWAPV2_GRAPH_API_URL, query)
             if token_data == None:
                 print(f'query failed: {query}')
