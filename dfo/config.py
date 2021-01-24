@@ -2,6 +2,10 @@ import os
 
 from web3.main import Web3
 
+
+MODEL_MAIN = 'model_a'
+PRICE_WEIGHT = 1000.0
+
 # interval for scoring and for  data collection
 INTERVAL = 60.0 # seconds
 REQUEST_TIMEOUT = 20.0 # seconds, graphql takes a while!
@@ -10,6 +14,10 @@ assert INTERVAL >= REQUEST_TIMEOUT * 2 # to ensure the thread pool behaves well
 
 PAST_HORIZON = 1200.0 # seconds
 # PAST_HORIZON / SAMPLING_INTERVAL is the number of past data points considered
+
+
+PORT = 8000  # has to mirror the deployment config
+HOST = '0.0.0.0'
 
 ORCA_API_URL = 'http://orcadefi.com:10000/api/v1/realtime/'
 ORCA_API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
@@ -20,13 +28,6 @@ INFURA_ENDPOINT = 'https://mainnet.infura.io/v3/eb577b703a3e4db89f756b660db47f6c
 
 UNISWAPV2_GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
 GRAPH_TOKEN_GROUP_SIZE = 8  # query in smaller group to avoid processing errors
-
-PORT = 8000  # has to mirror the deployment config
-HOST = '0.0.0.0'
-
-PRICE_WEIGHT = 2.0
-
-MODEL_MAIN = 'model_a'
 
 
 UNISWAPV2_TOKENIDS = {
