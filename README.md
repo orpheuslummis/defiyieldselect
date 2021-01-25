@@ -19,7 +19,7 @@ Run locally without Docker (requires Python 3.8 and poetry): `poetry install; so
 
 Run remotely with kubernetes: `./run-remote-k8s.sh`
 
-Define your prefered parameters of the app in `dfo/config.py`, or leave it at the defaults.
+Define your preferred parameters in `dfo/config.py`, or leave it at the defaults. For more details see the comments in the file.
 
 
 ## API
