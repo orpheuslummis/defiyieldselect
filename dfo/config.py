@@ -1,29 +1,37 @@
+# Configuring tokens:
+# 1. APR_TOKEN_TO_UNISWAPV2_TOKENS is a mapping from APR token name to Uniswap token name.
+#    The APR token will be read from the APR API's data
+# 2. UNISWAPV2_TOKENIDS is a mapping from Uniswap token name to Uniswap token address for price data
+
+# here, time units are seconds
+
 import os
 
 from web3.main import Web3
 
-
 MODEL_MAIN = 'model_a'
-PRICE_WEIGHT = 1000.0
+MODEL_A_PRICE_WEIGHT = 2000.0
 
-# interval for scoring and for  data collection
-INTERVAL = 60.0 # seconds
-REQUEST_TIMEOUT = 20.0 # seconds, graphql takes a while!
-SAMPLING_INTERVAL = '1min'
+PAST_HORIZON = 1200.0
+
+RESAMPLING_INTERVAL = '1min'
+
+# interval for scoring and for data collection
+INTERVAL = 60.0
+REQUEST_TIMEOUT = 20.0  # graphql takes a while!
 assert INTERVAL >= REQUEST_TIMEOUT * 2 # to ensure the thread pool behaves well
 
-PAST_HORIZON = 1200.0 # seconds
-# PAST_HORIZON / SAMPLING_INTERVAL is the number of past data points considered
-
-
-PORT = 8000  # has to mirror the deployment config
+PORT = 8000
 HOST = '0.0.0.0'
+
+DATA_PATH = 'data'
+os.makedirs(DATA_PATH, exist_ok=True)
 
 ORCA_API_URL = 'http://orcadefi.com:10000/api/v1/realtime/'
 ORCA_API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
 ORCA_API_MANTISSA = 1e18
 
-# Orfeo holds this endpoint, not garanteed to work beyond the first months of 2020
+# Endpoint access provided until March 2021
 INFURA_ENDPOINT = 'https://mainnet.infura.io/v3/eb577b703a3e4db89f756b660db47f6c'
 
 UNISWAPV2_GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
@@ -120,15 +128,11 @@ APR_TOKENS = APR_TOKEN_TO_UNISWAPV2_TOKENS.keys() # a shorthand
 #   recent block: 11675081 at Jan-17-2021 09:10:49 PM +UTC
 #   timespan: datetime.timedelta(days=1998, seconds=20661)
 #   11675081/(timespan.total_seconds) = 14.787722757555173
+# FIXME currently the heuristic is quite erroneous
 AVG_BLOCK_TIME_HEURISTIC = 13.0 # seconds
 
 
 if os.getenv('DEBUG') == 'True':
     DEBUG = True
-    DATA_PATH = 'data'
-    # PAST_HORIZON = 6000.0
 else:
     DEBUG = False
-    # DATA_PATH = '/data'
-    DATA_PATH = 'data'
-os.makedirs(DATA_PATH, exist_ok=True)

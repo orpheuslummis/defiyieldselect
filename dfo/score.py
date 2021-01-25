@@ -9,7 +9,7 @@ from scipy.stats import linregress
 
 from dfo.config import (APR_TOKEN_TO_UNISWAPV2_TOKENS, APR_TOKENS, DEBUG,
                         INTERVAL, ORCA_API_MANTISSA, PAST_HORIZON,
-                        PRICE_WEIGHT, SAMPLING_INTERVAL)
+                        MODEL_A_PRICE_WEIGHT, RESAMPLING_INTERVAL)
 from dfo.db import APR, Price, Result, prepared_db
 
 database = prepared_db()
@@ -18,7 +18,7 @@ database = prepared_db()
 def model_a(token_apr: str, data_price: pd.DataFrame, data_apr: pd.DataFrame) -> float:
     """approach: multiply APR by a weighted slope of linear regression of price"""
     reg_price = linregress(data_price.seconds_since, data_price.value)
-    price_factor = (1 + reg_price.slope * PRICE_WEIGHT)
+    price_factor = (1 + reg_price.slope * MODEL_A_PRICE_WEIGHT)
     apr_mean = data_apr['value'].mean()
     score = price_factor * apr_mean
     if DEBUG: print(f"model_a: {score=:.3f} ({price_factor=:.3f} * {apr_mean=:.3f}) {token_apr}")
@@ -79,7 +79,7 @@ def get_recent_dataframe_token(modelname: str, token_apr: str, now: datetime) ->
     # resample
     data.datetime = pd.to_datetime(data.datetime)
     data = data.set_index('datetime')
-    data  = data.resample(SAMPLING_INTERVAL).mean().bfill()
+    data  = data.resample(RESAMPLING_INTERVAL).mean().bfill()
     # obtain time relative to beginning of frame for regression
     data = data.reset_index()
     data.datetime = pd.to_numeric(data.datetime)
