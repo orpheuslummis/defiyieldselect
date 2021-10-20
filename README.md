@@ -1,12 +1,15 @@
 # DeFI interest rate recommender
 
-Work done for Bowhead by Orpheus Lummis in January 2021.
+API providing scores for DeFi interest rates opportunities, using APR data from Compound, Fulcrum, Aave, dYdX; price data from thegraph.com (UniswapV2 subgraph); block timestamps from web3 using Infura.
 
 Three main components:
 
 - Collecting APR and price data (`collect`)
 - Score each pair of curves (`score`)
 - Expose the scores via a Web JSON API (`serve`)
+
+
+Work done for Bowhead by Orpheus Lummis in January 2021.
 
 
 ## How to run
