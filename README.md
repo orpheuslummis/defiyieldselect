@@ -1,4 +1,4 @@
-# DeFi yield optimization
+# DeFI interest rate recommender
 
 Work done for Bowhead by Orpheus Lummis in January 2021.
 
@@ -87,7 +87,5 @@ The price data source (thegraph.com) supports at most a polling frequency of 30-
 5-10% of the token price queries to thegraph.com fail, even when we purposefuly do simpler (but more) queries. The impact of this is tolerable because of the regularity of the data and the timespan of minutes we're operating on.
 
 The `_start` field of the APR field is not used as we assume the `_stop` field is the given time of APR measurement.
-
-This app is deployed at [https://equivos.dev/defiyieldoptimization/](https://equivos.dev/defiyieldoptimization/) for the duration of January and February 2021.
 
 Correctness is a goal here, but for the sake of time only piecemeal testing was done for tricky bits, in a different repository.
