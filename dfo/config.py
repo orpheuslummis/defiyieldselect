@@ -27,9 +27,7 @@ HOST = '0.0.0.0'
 DATA_PATH = 'data'
 os.makedirs(DATA_PATH, exist_ok=True)
 
-ORCA_API_URL = 'http://orcadefi.com:10000/api/v1/realtime/'
-ORCA_API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMyNDU2MSIsIm5hbWUiOiJNaXJvc2xhdiIsImlhdCI6Nzg5NDUyMTIzNTZ9.GQ5LR3jdhmTl_rmKgNPzrgNRrx9nflhJBiEgjz5Coec'
-ORCA_API_MANTISSA = 1e18
+# TODO bring in direct access to DeFi yield data sources
 
 # Endpoint access provided until March 2021
 INFURA_ENDPOINT = 'https://mainnet.infura.io/v3/eb577b703a3e4db89f756b660db47f6c'
